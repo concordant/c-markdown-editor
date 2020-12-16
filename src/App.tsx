@@ -1,10 +1,11 @@
 import React from 'react';
 import './App.css';
+import CMDEd from './Components/CMDEd';
 
 function App() {
   return (
     <div className="App">
-      Hello!
+      <CMDEd />
     </div>
   );
 }
