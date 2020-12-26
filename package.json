@@ -1,7 +1,18 @@
 {
-  "name": "crdt-mded",
-  "version": "0.1.0",
+  "name": "c-mded",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "Ilyas Toumlilt <ilyas@toumlilt.com>",
+  "description": "A Markdown collaborative Editor React Component, to demonstrate the Concordant Platform",
+  "homepage": "/",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.inria.fr/concordant/software/c-markdown-editor.git"
+  },
+  "bugs": {
+    "url": "https://gitlab.inria.fr/concordant/software/c-markdown-editor/-/issues"
+  },
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",

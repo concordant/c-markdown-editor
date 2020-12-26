@@ -1,6 +1,6 @@
-# CRDT-MDed
+# C-MD-Editor
 
-Just having fun with CRDTs
+A collaborative Markdown Editor React Component, to demonstrate the Concordant Platform.
 
 ## Available Scripts
 
