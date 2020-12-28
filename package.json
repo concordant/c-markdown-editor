@@ -4,11 +4,6 @@
   "license": "MIT",
   "author": "Ilyas Toumlilt <ilyas@toumlilt.com>",
   "description": "A Markdown collaborative Editor React Component, to demonstrate the Concordant Platform",
-  "main": "./dist/main.js",
-  "types": "./dist/main.d.ts",
-  "files": [
-    "dist/**/*"
-  ],
   "homepage": "/",
   "private": true,
   "repository": {
@@ -58,10 +53,6 @@
     ]
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-react": "^6.24.1",
-    "babel-preset-stage-0": "^6.24.1",
     "typescript": "^4.1.3"
   }
 }
