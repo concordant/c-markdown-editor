@@ -4,6 +4,10 @@
   "license": "MIT",
   "author": "Ilyas Toumlilt <ilyas@toumlilt.com>",
   "description": "A Markdown collaborative Editor React Component, to demonstrate the Concordant Platform",
+  "main": "./dist/main.js",
+  "files": [
+    "dist/**/*"
+  ],
   "homepage": "/",
   "private": true,
   "repository": {
