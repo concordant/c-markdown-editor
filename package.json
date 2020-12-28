@@ -6,6 +6,11 @@
   "description": "A Markdown collaborative Editor React Component, to demonstrate the Concordant Platform",
   "homepage": "/",
   "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
   "repository": {
     "type": "git",
     "url": "git+ssh://git@gitlab.inria.fr/concordant/software/c-markdown-editor.git"
