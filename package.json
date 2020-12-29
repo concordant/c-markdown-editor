@@ -6,8 +6,8 @@
   "description": "A Markdown collaborative Editor React Component, to demonstrate the Concordant Platform",
   "homepage": "/",
   "private": true,
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/main.js",
+  "types": "./dist/main.d.ts",
   "files": [
     "dist/**/*"
   ],
@@ -34,7 +34,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "tsc",
+    "build": "rm -rf ./dist && tsc",
     "prepare": "yarn run build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
