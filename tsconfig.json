@@ -12,7 +12,7 @@
     "allowJs": true,
     "strict": true,
     "esModuleInterop": true,
-    "module": "esnext",
+    "module": "commonjs",
     "jsx": "react-jsx",
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
