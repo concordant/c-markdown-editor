@@ -49,7 +49,15 @@ const SHORTCUTS: { [char: string]: string } = {
  * MD Shortcut -> HTML translation
  * @param param0
  */
-const Element = ({ attributes, children, element }: {attributes: any, children: any, element: SlateElement}) => {
+const Element = ({
+  attributes,
+  children,
+  element,
+}: {
+  attributes: any;
+  children: any;
+  element: SlateElement;
+}) => {
   switch (element.type) {
     case "block-quote":
       return <blockquote {...attributes}>{children}</blockquote>;
@@ -223,4 +231,10 @@ export default function CMDEd(props: CMDEdProps) {
       />
     </Slate>
   );
+}
+
+export class CMDEdClassComponent extends React.Component {
+  render() {
+    return <CMDEd />;
+  }
 }
