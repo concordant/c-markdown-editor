@@ -232,9 +232,3 @@ export default function CMDEd(props: CMDEdProps) {
     </Slate>
   );
 }
-
-export class CMDEdClassComponent extends React.Component {
-  render() {
-    return <CMDEd />;
-  }
-}
