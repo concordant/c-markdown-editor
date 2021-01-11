@@ -19,8 +19,10 @@
     "url": "https://gitlab.inria.fr/concordant/software/c-markdown-editor/-/issues"
   },
   "dependencies": {
+    "canner-slate-editor": "^1.5.4",
     "slate": "^0.59.0",
     "slate-history": "^0.59.0",
+    "slate-md-editor": "^1.5.4",
     "slate-react": "^0.59.0",
     "web-vitals": "^0.2.4"
   },
@@ -57,6 +59,7 @@
     "@types/node": "^14.14.20",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
+    "antd": "^4.10.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "^4.0.1",
