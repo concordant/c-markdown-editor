@@ -44,8 +44,9 @@ let session = client.Session.Companion.connect("mdeditor",
  */
 let collection = session.openCollection("mdeditorCollection", false);
 
-// Concordant Markdone Editor
-// A collaborative version of the MDEditor component
+/**
+ * Concordant Markdone Editor, a collaborative version of the MDEditor component
+ **/
 export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState> {
     /**
      * Timer use for refresh
