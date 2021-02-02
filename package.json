@@ -28,6 +28,7 @@
     "@types/react": "^16.9.53",
     "@types/react-dom": "^16.9.8",
     "@uiw/react-md-editor": "^1.14.6",
+    "prismjs": "^1.23.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.1",
