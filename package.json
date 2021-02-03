@@ -1,6 +1,6 @@
 {
   "name": "c-mded",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "MIT",
   "author": "Ilyas Toumlilt <ilyas@toumlilt.com>",
   "description": "A Markdown collaborative Editor React Component, to demonstrate the Concordant Platform",
@@ -19,17 +19,24 @@
     "url": "https://gitlab.inria.fr/concordant/software/c-markdown-editor/-/issues"
   },
   "dependencies": {
-    "canner-slate-editor": "^1.5.4",
-    "slate": "^0.59.0",
-    "slate-history": "^0.59.0",
-    "slate-md-editor": "^1.5.4",
-    "slate-react": "^0.59.0",
+    "@concordant/c-client": "^1.1.1",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "@types/jest": "^26.0.15",
+    "@types/node": "^12.0.0",
+    "@types/react": "^16.9.53",
+    "@types/react-dom": "^16.9.8",
+    "@uiw/react-md-editor": "^1.14.6",
+    "prismjs": "^1.23.0",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-scripts": "4.0.1",
     "web-vitals": "^0.2.4"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "rm -rf ./dist && tsc",
-    "prepare": "yarn run build",
+    "build": "rm -rf ./build && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
