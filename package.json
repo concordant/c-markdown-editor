@@ -1,6 +1,6 @@
 {
   "name": "c-mded",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "MIT",
   "author": "Ilyas Toumlilt <ilyas@toumlilt.com>",
   "description": "A Markdown collaborative Editor React Component, to demonstrate the Concordant Platform",
@@ -19,7 +19,7 @@
     "url": "https://gitlab.inria.fr/concordant/software/c-markdown-editor/-/issues"
   },
   "dependencies": {
-    "@concordant/c-client": "^1.0.0",
+    "@concordant/c-client": "^1.1.1",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
@@ -36,8 +36,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "rm -rf ./dist && tsc",
-    "prepare": "npm run build",
+    "build": "rm -rf ./build && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
