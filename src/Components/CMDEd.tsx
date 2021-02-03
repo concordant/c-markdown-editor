@@ -31,13 +31,14 @@ export interface CMDEditorState {
     value: string;
 }
 
+let CONFIG = require('../config.json');
+
 /**
  * Concordant session
  * Connection is done to localhost, should probably be changed fepending on the
  * expected deployement.
  */
-let session = client.Session.Companion.connect("mdeditor",
-    "http://127.0.0.1:4000", "credentials");
+let session = client.Session.Companion.connect(CONFIG.dbName, CONFIG.serviceUrl, CONFIG.credentials);
 
 /**
  * Concordant collection
@@ -65,9 +66,9 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
         super(props);
         this.rga = collection.open("myrga", "RGA", false, function () {return});
         session.transaction(client.utils.ConsistencyLevel.None, () => {
-          this.state = {
-            value: this.rga.get().toArray().join(""),
-          };
+            this.state = {
+                value: this.rga.get().toArray().join(""),
+            };
         });
     }
 
@@ -75,25 +76,25 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      * Handler called when there is a change in the underlying MDEditor.
      */
     public valueChanged(value: string | undefined) {
-      let valueStr = (typeof value == 'undefined') ? "" : value;
-      if (this.state.value === valueStr) return;
+        let valueStr = (typeof value == 'undefined') ? "" : value;
+        if (this.state.value === valueStr) return;
 
-      session.transaction(client.utils.ConsistencyLevel.None, () => {
-        let minLength = this.state.value.length > valueStr.length ? valueStr.length : this.state.value.length;
-        for (let i = 0; i <= minLength; i++) {
-          if (this.state.value.charAt(i) !== valueStr.charAt(i) || i === minLength) {
-            if (valueStr.length !== minLength) { // insert
-              this.rga.insertAt(i, valueStr.charAt(i));
-            } else { // delete
-              this.rga.removeAt(i);
+        session.transaction(client.utils.ConsistencyLevel.None, () => {
+            let minLength = this.state.value.length > valueStr.length ? valueStr.length : this.state.value.length;
+            for (let i = 0; i <= minLength; i++) {
+                if (this.state.value.charAt(i) !== valueStr.charAt(i) || i === minLength) {
+                    if (valueStr.length !== minLength) { // insert
+                        this.rga.insertAt(i, valueStr.charAt(i));
+                    } else { // delete
+                        this.rga.removeAt(i);
+                    }
+                    break;
+                }
             }
-            break;
-          }
-        }
-        this.setState({
-            value: this.rga.get().toArray().join(""),
+            this.setState({
+                value: this.rga.get().toArray().join(""),
+            });
         });
-      });
     }
 
     /**
