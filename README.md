@@ -23,6 +23,12 @@ Go to project root directory and:
 npm install
 ```
 
+### Configuration
+
+Some parameters are configurable and stored in the file `src/config.json`:
+- *serverUrl*: is the url of the c-service that should be used;
+- *dbName*: is the name of the database you want to store your content.
+
 ### Run the application
 
 Go to project root directory and:
