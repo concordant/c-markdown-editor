@@ -27,7 +27,7 @@ npm install
 
 Some parameters are configurable and stored in the file `src/config.json`:
 - *serverUrl*: is the url of the c-service that should be used;
-- *dbName*: is the name of the database you want to store your content.
+- *dbName*: is the name of the database you want to store your content in.
 
 ### Run the application
 
