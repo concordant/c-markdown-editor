@@ -64,11 +64,14 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      */
     constructor(props: CMDEditorProps) {
         super(props);
+        this.state = {
+            value: "",
+        };
         this.rga = collection.open("myrga", "RGA", false, function () {return});
         session.transaction(client.utils.ConsistencyLevel.None, () => {
-            this.state = {
+            this.setState({
                 value: this.rga.get().toArray().join(""),
-            };
+            });
         });
     }
 
@@ -76,19 +79,23 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      * Handler called when there is a change in the underlying MDEditor.
      */
     public valueChanged(value: string | undefined) {
-        let valueStr = (typeof value == 'undefined') ? "" : value;
-        if (this.state.value === valueStr) return;
+        let valueUI = (typeof value == 'undefined') ? "" : value;
+        if (this.state.value === valueUI) return;
 
         session.transaction(client.utils.ConsistencyLevel.None, () => {
-            let minLength = this.state.value.length > valueStr.length ? valueStr.length : this.state.value.length;
-            for (let i = 0; i <= minLength; i++) {
-                if (this.state.value.charAt(i) !== valueStr.charAt(i) || i === minLength) {
-                    if (valueStr.length !== minLength) { // insert
-                        this.rga.insertAt(i, valueStr.charAt(i));
+            let maxLength = this.state.value.length < valueUI.length ? valueUI.length : this.state.value.length;
+            let isOpInsert = maxLength === valueUI.length;
+            let nAppliedOp = 0;
+            for (let i = 0; i < maxLength; i++) {
+                let idxUI = isOpInsert ? i : i - nAppliedOp;
+                let idxRGA = isOpInsert ? i - nAppliedOp : i;
+                if (idxUI >= valueUI.length || idxRGA >= this.state.value.length || this.state.value.charAt(idxRGA) !== valueUI.charAt(idxUI)) {
+                    if (isOpInsert) { // insert
+                        this.rga.insertAt(idxUI, valueUI.charAt(idxUI));
                     } else { // delete
-                        this.rga.removeAt(i);
+                        this.rga.removeAt(idxUI);
                     }
-                    break;
+                    nAppliedOp++;
                 }
             }
             this.setState({
