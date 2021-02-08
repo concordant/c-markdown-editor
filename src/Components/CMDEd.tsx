@@ -1,22 +1,6 @@
-import React, {Component} from 'react';
-import MDEditor, { ICommand } from '@uiw/react-md-editor';
 import { client } from '@concordant/c-client';
-
-export interface ICMDEdConfig {
-    /**
-     * An array of ICommand, which, each one, contain a commands property. If no commands are specified, the default will be used. Commands are explained in more details here:
-     * https://github.com/uiwjs/react-md-editor/blob/098c0b657300bfbfef83976558ee37f737e842a2/src/commands/index.ts#L20-L29
-     */
-    commands?: ICommand;
-    /**
-     * Can be used to make Markdown Editor focus itself on initialization.
-     */
-    autoFocus?: boolean;
-    /**
-     * This is reset @uiw/react-markdown-preview settings.
-     */
-    //TODO: need to install @uiw/react-markdown-preview  previewOptions?: ReactMarkdown.ReactMarkdownProps;
-}
+import React, { Component } from 'react';
+import MDEditor from '@uiw/react-md-editor';
 
 /**
  * Interface for Concordant MDEditor properties.
@@ -64,15 +48,14 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      */
     constructor(props: CMDEditorProps) {
         super(props);
-        this.state = {
-            value: "",
-        };
+        let value = "";
         this.rga = collection.open("myrga", "RGA", false, function () {return});
         session.transaction(client.utils.ConsistencyLevel.None, () => {
-            this.setState({
-                value: this.rga.get().toArray().join(""),
-            });
+            value = this.rga.get().toArray().join("");
         });
+        this.state = {
+            value,
+        };
     }
 
     /**
@@ -134,17 +117,14 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      * returns a React element corresponding to the MDEditor.
      */
     render() {
-        const editor = (
-            <div className="container">
+        return (
+            <div>
                 <MDEditor
                     value={this.state.value}
                     onChange={this.valueChanged.bind(this)}
-                    fullscreen={true}
+                    height={500}
                 />
-                <MDEditor.Markdown source={this.state.value} />
             </div>
         );
-
-        return editor;
     }
 }

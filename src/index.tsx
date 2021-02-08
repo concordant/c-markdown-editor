@@ -1,17 +1,34 @@
+import './index.css';
+import CMDEd from './Components/CMDEd';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+    <>
+        <div className="header background-turquoise padding">
+            <h1>C-Markdown Editor</h1>
+            <h2>Collaborative Markdown editor using Concordant CRDTs</h2>
+        </div>
+        <div className="intro reduceWidth">
+            <p>
+                Our collaborative editor enables multiple users to collaborate
+                over a shared text document. It supports both synchronous and
+                asynchronous modes. In synchronous mode, multiple users
+                connected and see each others' edits in real time. In
+                asynchronous mode, a user works disconnected, and his/her
+                updates are merged into the shared document when he/she
+                reconnects. Switching between synchronous and asynchrounous
+                modes is seamless: the editor continues to work without a
+                hitch, and without any loss of data.
+            </p>
+            <p>
+                The Markdown editor exercises the RGA and LWWMap CRDTs.
+            </p>
+        </div>
+        <CMDEd />
+        <div className="padding">
+            <p className="footer">© CONCORDANT 2021.</p>
+        </div>
+    </>,
+    document.getElementById('root')
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
