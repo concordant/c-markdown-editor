@@ -32,14 +32,14 @@ body {
     text-align: center;
 }
 
-header.h1 {
+.header h1 {
     font-size: 34px;
     line-height: 30px;
     text-align: center;
     font-weight: bold;
 }
 
-header.h2 {
+.header h2 {
     font-size: 26px;
     text-align: center;
     font-weight: bold;
