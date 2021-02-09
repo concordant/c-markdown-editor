@@ -1,13 +1,10 @@
 {
-  "name": "c-mded",
+  "name": "c-markdown-editor",
   "version": "1.0.1",
   "license": "MIT",
-  "author": "Ilyas Toumlilt <ilyas@toumlilt.com>",
+  "author": "Ludovic Le Frioux <ludovic.lefrioux@concordant.io>",
   "description": "A Markdown collaborative Editor React Component, to demonstrate the Concordant Platform",
   "homepage": "./",
-  "private": true,
-  "main": "./dist/main.js",
-  "types": "./dist/main.d.ts",
   "files": [
     "dist/**/*"
   ],
