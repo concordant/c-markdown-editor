@@ -1,6 +1,7 @@
 import { client } from '@concordant/c-client';
 import React, { Component } from 'react';
 import MDEditor from '@uiw/react-md-editor';
+import Submit1Input from './Submit1Input';
 
 /**
  * Interface for Concordant MDEditor properties.
@@ -12,7 +13,8 @@ export interface CMDEditorProps {
  * Interface for Concordant MDEditor state.
  */
 export interface CMDEditorState {
-    value: string;
+    value: string,
+    docName: string
 }
 
 let CONFIG = require('../config.json');
@@ -27,7 +29,7 @@ let session = client.Session.Companion.connect(CONFIG.dbName, CONFIG.serviceUrl,
 /**
  * Concordant collection
  */
-let collection = session.openCollection("mdeditorCollection", false);
+let collection = session.openCollection("mdeditor", false);
 
 /**
  * Concordant Markdone Editor, a collaborative version of the MDEditor component
@@ -40,7 +42,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
 
     /**
      * RGA of chars representing the editor string value
-     */ 
+     */
     private rga: any;
 
     /**
@@ -49,12 +51,14 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
     constructor(props: CMDEditorProps) {
         super(props);
         let value = "";
-        this.rga = collection.open("myrga", "RGA", false, function () {return});
+        let docName = "Untitled-1"
+        this.rga = collection.open(docName, "RGA", false, function () {return});
         session.transaction(client.utils.ConsistencyLevel.None, () => {
             value = this.rga.get().toArray().join("");
         });
         this.state = {
-            value,
+            value: value,
+            docName: docName
         };
     }
 
@@ -113,12 +117,27 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
     }
 
     /**
+     * This handler is called when a new document name is submit.
+     * @param docName Name of the desired document.
+     */
+    handleSubmit(docName: string) {
+        let value = ""
+        this.rga = collection.open(docName, "RGA", false, function () {return});
+        session.transaction(client.utils.ConsistencyLevel.None, () => {
+            value = this.rga.get().toArray().join("");
+        });
+        this.setState({value: value, docName: docName});
+    }
+
+    /**
      * The function is called when the content of the editor is updated. It
      * returns a React element corresponding to the MDEditor.
      */
     render() {
         return (
             <div>
+                <div>Current document : {this.state.docName}</div>
+                <Submit1Input inputName="Document" onSubmit={this.handleSubmit.bind(this)} /><br />
                 <MDEditor
                     value={this.state.value}
                     onChange={this.valueChanged.bind(this)}
