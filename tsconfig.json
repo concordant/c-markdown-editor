@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "outDir": "./dist/",
     "target": "es5",
     "lib": [
       "es2015",
@@ -25,9 +24,5 @@
   },
   "include": [
     "src"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
   ]
 }

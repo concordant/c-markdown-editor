@@ -1,19 +1,19 @@
 {
-  "name": "c-markdown-editor",
+  "name": "@concordant/c-markdown-editor",
   "version": "1.0.1",
   "license": "MIT",
-  "author": "Ludovic Le Frioux <ludovic.lefrioux@concordant.io>",
   "description": "A Markdown collaborative Editor React Component, to demonstrate the Concordant Platform",
   "homepage": "./",
+  "author": "Concordant",
+  "bugs": {
+    "email": "support@concordant.io"
+  },
   "files": [
-    "dist/**/*"
+    "build/**/*"
   ],
   "repository": {
     "type": "git",
     "url": "git+ssh://git@gitlab.inria.fr/concordant/software/c-markdown-editor.git"
-  },
-  "bugs": {
-    "url": "https://gitlab.inria.fr/concordant/software/c-markdown-editor/-/issues"
   },
   "dependencies": {
     "@concordant/c-client": "^1.1.1",
@@ -34,6 +34,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "prepare": "npm run build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
