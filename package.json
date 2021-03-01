@@ -1,29 +1,25 @@
 {
-  "name": "c-markdown-editor",
-  "version": "1.0.1",
+  "name": "@concordant/c-markdown-editor",
+  "version": "1.0.2",
   "license": "MIT",
-  "author": "Ludovic Le Frioux <ludovic.lefrioux@concordant.io>",
   "description": "A Markdown collaborative Editor React Component, to demonstrate the Concordant Platform",
   "homepage": "./",
+  "author": "Concordant",
+  "bugs": {
+    "email": "support@concordant.io"
+  },
   "files": [
-    "dist/**/*"
+    "build/**/*"
   ],
   "repository": {
     "type": "git",
     "url": "git+ssh://git@gitlab.inria.fr/concordant/software/c-markdown-editor.git"
   },
-  "bugs": {
-    "url": "https://gitlab.inria.fr/concordant/software/c-markdown-editor/-/issues"
-  },
   "dependencies": {
-    "@concordant/c-client": "^1.1.1",
+    "@concordant/c-client": "^1.1.5",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
-    "@testing-library/user-event": "^12.1.10",
     "@types/jest": "^26.0.15",
-    "@types/node": "^12.0.0",
-    "@types/react": "^16.9.53",
-    "@types/react-dom": "^16.9.8",
     "@uiw/react-md-editor": "^1.14.6",
     "prismjs": "^1.23.0",
     "react": "^17.0.1",
@@ -34,6 +30,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "prepare": "npm run build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -58,16 +55,16 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^5.11.8",
     "@testing-library/react": "^11.2.3",
-    "@testing-library/user-event": "^12.6.0",
+    "@testing-library/user-event": "^12.8.0",
     "@types/jest": "^26.0.20",
-    "@types/node": "^14.14.20",
-    "@types/react": "^17.0.0",
-    "@types/react-dom": "^17.0.0",
-    "antd": "^4.10.2",
+    "@types/node": "^12.20.4",
+    "@types/react": "^16.14.4",
+    "@types/react-dom": "^16.9.11",
+    "antd": "^4.13.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "^4.0.1",
-    "ts-loader": "^8.0.12",
-    "typescript": "^4.1.3"
+    "ts-loader": "^8.0.17",
+    "typescript": "^4.2.2"
   }
 }
