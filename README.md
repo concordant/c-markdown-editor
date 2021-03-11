@@ -55,6 +55,23 @@ performance.
 The build is minified and the filenames include the hashes. Your app is ready
 to be deployed!
 
+### Use as a React component
+
+Install the package:
+```shell
+$ npm i @concordant/c-markdown-editor
+```
+
+Import the component in your project:
+``` typescript
+import CMDEd from '@concordant/c-markdown-editor';
+```
+
+Use the Markdown Editor component (replace with your database name and the url of your c-service):
+``` typescript
+<CMDEd dbName=<dbName> serviceUrl=<serviceUrl> credentials="" />
+```
+
 ## Requirements (versions)
 
 Node: v14.15.0+
