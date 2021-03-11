@@ -3,6 +3,8 @@ import CMDEd from './Components/CMDEd';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+let CONFIG = require('./config.json');
+
 ReactDOM.render(
     <>
         <div className="header background-turquoise padding">
@@ -25,7 +27,7 @@ ReactDOM.render(
                 The Markdown editor exercises the RGA and LWWMap CRDTs.
             </p>
         </div>
-        <CMDEd />
+        <CMDEd dbName={CONFIG.dbName} serviceUrl={CONFIG.serviceUrl} credentials={CONFIG.credentials} />
         <div className="padding">
             <p className="footer">© CONCORDANT 2021.</p>
         </div>
