@@ -11,8 +11,7 @@
   "main": "./dist/Components/CMDEd.js",
   "types": "./dist/Components/CMDEd.d.ts",
   "files": [
-    "dist/**/*",
-    "build/**/*"
+    "dist/**/*"
   ],
   "repository": {
     "type": "git",

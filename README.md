@@ -69,7 +69,7 @@ import CMDEd from '@concordant/c-markdown-editor';
 
 Use the Markdown Editor component (replace with your database name and the url of your c-service):
 ``` typescript
-<CMDEd dbName=<dbName> serviceUrl=<serviceUrl> credentials="" />
+<CMDEd.CMDEd dbName=<dbName> serviceUrl=<serviceUrl> credentials="" />
 ```
 
 ## Requirements (versions)
