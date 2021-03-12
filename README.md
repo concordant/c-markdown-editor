@@ -62,15 +62,24 @@ Install the package:
 $ npm i @concordant/c-markdown-editor
 ```
 
-Import the component in your project:
+Import the c-client and the component in your project:
 ``` typescript
+import { client } from '@concordant/c-client';
 import CMDEd from '@concordant/c-markdown-editor';
 ```
 
-Use the Markdown Editor component (replace with your database name and the url of your c-service):
+Open a session and a collection (replace with your database name, the url of your c-service and credentials):
 ``` typescript
-<CMDEd.CMDEd dbName=<dbName> serviceUrl=<serviceUrl> credentials="" />
+let session = client.Session.Companion.connect(<dbName>, <serviceUrl>, <credentials>);
+let collection = session.openCollection("mdeditor", false);
 ```
+
+Use the Markdown Editor component:
+``` typescript
+<CMDEd session={session} collection={collection} />
+```
+
+> You can provide the name of the document with docName parameter (optional).
 
 ## Requirements (versions)
 

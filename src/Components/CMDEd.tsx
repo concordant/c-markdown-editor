@@ -7,9 +7,9 @@ import Submit1Input from './Submit1Input';
  * Interface for Concordant MDEditor properties.
  */
 export interface CMDEditorProps {
-    dbName: string,
-    serviceUrl: string,
-    credentials: string
+    session: any,
+    collection: any,
+    docName: string
 }
 
 /**
@@ -30,21 +30,13 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
     private timerID!: NodeJS.Timeout;
 
     /**
-     * Concordant session
-     * Connection is done to localhost, should probably be changed fepending on the
-     * expected deployement.
-     */
-    private session = client.Session.Companion.connect(this.props.dbName, this.props.serviceUrl, this.props.credentials);
-
-    /**
-     * Concordant collection
-     */
-    private collection = this.session.openCollection("mdeditor", false);
-
-    /**
      * RGA of chars representing the editor string value
      */
     private rga: any;
+
+    public static defaultProps = {
+        docName: "Untitled-1"
+    }
 
     /**
      * Default constructor.
@@ -52,14 +44,13 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
     constructor(props: CMDEditorProps) {
         super(props);
         let value = "";
-        let docName = "Untitled-1"
-        this.rga = this.collection.open(docName, "RGA", false, function () {return});
-        this.session.transaction(client.utils.ConsistencyLevel.None, () => {
+        this.rga = this.props.collection.open(this.props.docName, "RGA", false, function () {return});
+        this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
             value = this.rga.get().toArray().join("");
         });
         this.state = {
             value: value,
-            docName: docName
+            docName: this.props.docName
         };
     }
 
@@ -70,7 +61,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
         let valueUI = (typeof value == 'undefined') ? "" : value;
         if (this.state.value === valueUI) return;
 
-        this.session.transaction(client.utils.ConsistencyLevel.None, () => {
+        this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
             let maxLength = this.state.value.length < valueUI.length ? valueUI.length : this.state.value.length;
             let isOpInsert = maxLength === valueUI.length;
             let nAppliedOp = 0;
@@ -99,7 +90,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
     componentDidMount() {
         this.timerID = setInterval(
             () => {
-                this.session.transaction(client.utils.ConsistencyLevel.None, () => {
+                this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
                     this.setState({
                         value: this.rga.get().toArray().join(""),
                     });
@@ -123,8 +114,8 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      */
     handleSubmit(docName: string) {
         let value = ""
-        this.rga = this.collection.open(docName, "RGA", false, function () {return});
-        this.session.transaction(client.utils.ConsistencyLevel.None, () => {
+        this.rga = this.props.collection.open(docName, "RGA", false, function () {return});
+        this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
             value = this.rga.get().toArray().join("");
         });
         this.setState({value: value, docName: docName});

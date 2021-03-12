@@ -1,8 +1,17 @@
 {
   "name": "@concordant/c-markdown-editor",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "license": "MIT",
   "description": "A Markdown collaborative Editor React Component, to demonstrate the Concordant Platform",
+  "keywords": [
+    "concordant",
+    "crdt",
+    "conflict-free",
+    "replicated datatypes",
+    "collaborative",
+    "markdown",
+    "editor"
+  ],
   "homepage": "./",
   "author": "Concordant",
   "bugs": {
@@ -30,6 +39,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "compile": "rm -rf dist && tsc",
+    "prepare": "npm run compile",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
