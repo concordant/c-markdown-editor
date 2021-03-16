@@ -38,8 +38,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "compile": "rm -rf dist && tsc",
-    "prepare": "npm run compile",
+    "prepare": "rm -rf dist && tsc",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
