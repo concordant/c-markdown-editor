@@ -2,7 +2,7 @@
 
 16 March 2021
 
-This is an alpha-status “version zero” of a collaborative text editor. Its aim is to provide an example of a collaborative application leveraging the Concordant vision. Features, performance, and user-friendliness have been secondary considerations.
+This is an alpha version of a collaborative text editor. Its aim is to provide an example of a collaborative application leveraging the Concordant vision. Features, performance, and user-friendliness have been secondary considerations.
 
 ## Limitations due to the editing engine
 
@@ -15,7 +15,7 @@ In order to fix these limitations, we plan to replace it with a single-panel edi
 
 ## Implementation-related limitations
 
-This implementation uses the “version 0” of the Concordant platform, and inherits from its limitations (documented in [Concordant client STATUS.md](https://github.com/concordant/c-client/blob/master/STATUS.md)). This leads to more limitations:
+This implementation uses the alpha version of the Concordant platform, and inherits from its limitations (documented in [Concordant client STATUS.md](https://github.com/concordant/c-client/blob/master/STATUS.md)). This leads to more limitations:
 
 - Disconnected operation is not yet supported.
 
