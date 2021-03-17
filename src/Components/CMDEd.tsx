@@ -2,6 +2,7 @@ import { client } from '@concordant/c-client';
 import React, { Component } from 'react';
 import MDEditor from '@uiw/react-md-editor';
 import Submit1Input from './Submit1Input';
+import DiffMatchPatch from 'diff-match-patch';
 
 /**
  * Interface for Concordant MDEditor properties.
@@ -61,20 +62,27 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
         let valueUI = (typeof value == 'undefined') ? "" : value;
         if (this.state.value === valueUI) return;
 
+        const dmp = new DiffMatchPatch.diff_match_patch();
+        const diffs = dmp.diff_main(this.state.value, valueUI);
+
         this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
-            let maxLength = this.state.value.length < valueUI.length ? valueUI.length : this.state.value.length;
-            let isOpInsert = maxLength === valueUI.length;
-            let nAppliedOp = 0;
-            for (let i = 0; i < maxLength; i++) {
-                let idxUI = isOpInsert ? i : i - nAppliedOp;
-                let idxRGA = isOpInsert ? i - nAppliedOp : i;
-                if (idxUI >= valueUI.length || idxRGA >= this.state.value.length || this.state.value.charAt(idxRGA) !== valueUI.charAt(idxUI)) {
-                    if (isOpInsert) { // insert
-                        this.rga.insertAt(idxUI, valueUI.charAt(idxUI));
-                    } else { // delete
-                        this.rga.removeAt(idxUI);
-                    }
-                    nAppliedOp++;
+            let idx = 0
+            for (let diff of diffs) {
+                switch (diff[0]) {
+                    case DiffMatchPatch.DIFF_EQUAL:
+                        idx += diff[1].length
+                        break;
+                    case DiffMatchPatch.DIFF_INSERT:
+                        for (let char of diff[1]){
+                            this.rga.insertAt(idx, char);
+                            idx++;
+                        }
+                        break;
+                    case DiffMatchPatch.DIFF_DELETE:
+                        for (var i = 0; i < diff[1].length; i++){
+                            this.rga.removeAt(idx);
+                        }
+                        break;
                 }
             }
             this.setState({
