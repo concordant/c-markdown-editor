@@ -1,7 +1,13 @@
 import './index.css';
-import CMDEd from './Components/CMDEd';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { client } from '@concordant/c-client';
+import CMDEd from './Components/CMDEd';
+
+let CONFIG = require('./config.json');
+
+let session = client.Session.Companion.connect(CONFIG.dbName, CONFIG.serviceUrl, CONFIG.credentials);
+let collection = session.openCollection("mdeditor", false);
 
 ReactDOM.render(
     <>
@@ -25,7 +31,7 @@ ReactDOM.render(
                 The Markdown editor exercises the RGA and LWWMap CRDTs.
             </p>
         </div>
-        <CMDEd />
+        <CMDEd session={session} collection={collection} />
         <div className="padding">
             <p className="footer">© CONCORDANT 2021.</p>
         </div>

@@ -5,23 +5,50 @@ component build on top of the MDEditor React component. This initial component
 has become collaborative thanks to features provided by the Concordant
 platform.
 
-## Setup guide
+## Requirements (versions)
 
-### Requirements
+This project has been tested
+on [Node.js](https://nodejs.org/en/download/) v14.15.0+
+using NPM v6.14.8+.
+It might work with older Node and NPM versions.
 
-For the next steps, you will need the following software:
-- Make sure you have the latest version of Node.js: [see official installation
-  guide](https://nodejs.org/en/download/);
-- The project uses the Concordant client library from Concordant private registry: [see
-  Usage
-section](https://gitlab.inria.fr/concordant/software/c-client/-/blob/master/README.md).
+## Use as a React component
+
+Install the package:
+```shell
+$ npm i @concordant/c-markdown-editor
+```
+
+Import the c-client and the component in your project:
+``` typescript
+import { client } from '@concordant/c-client';
+import CMDEd from '@concordant/c-markdown-editor';
+```
+
+Open a session and a collection (replace with your database name, the url of your c-service and credentials):
+``` typescript
+let session = client.Session.Companion.connect(<dbName>, <serviceUrl>, <credentials>);
+let collection = session.openCollection("mdeditor", false);
+```
+
+Use the Markdown Editor component:
+``` typescript
+<CMDEd session={session} collection={collection} />
+```
+
+> You can provide the name of the document with docName parameter (optional).
+
+## Standalone editor
+
+A demo standalone application is included in the editor source repository.
 
 ### Install Project dependencies
 
-Go to project root directory and:
+Clone the Git repository, and run inside:
 ```shell
 npm install
 ```
+This will install all dependencies.
 
 ### Configuration
 
@@ -41,9 +68,7 @@ This will run the app in the development mode.
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 The page will reload if you make edits.
 
-### Create production build
-
-Go to project root directory and:
+To make a production build with the updated configuration, run:
 ```shell
 npm run build
 ```
@@ -55,10 +80,4 @@ performance.
 The build is minified and the filenames include the hashes. Your app is ready
 to be deployed!
 
-## Requirements (versions)
 
-Node: v14.15.0+
-
-NPM: v6.14.8+
-
-(Project might work with older Node and NPM versions)

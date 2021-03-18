@@ -1,15 +1,26 @@
 {
   "name": "@concordant/c-markdown-editor",
-  "version": "1.0.2",
+  "version": "1.0.6",
   "license": "MIT",
   "description": "A Markdown collaborative Editor React Component, to demonstrate the Concordant Platform",
+  "keywords": [
+    "concordant",
+    "crdt",
+    "conflict-free",
+    "replicated datatypes",
+    "collaborative",
+    "markdown",
+    "editor"
+  ],
   "homepage": "./",
   "author": "Concordant",
   "bugs": {
     "email": "support@concordant.io"
   },
+  "main": "./dist/Components/CMDEd.js",
+  "types": "./dist/Components/CMDEd.d.ts",
   "files": [
-    "build/**/*"
+    "dist/**/*"
   ],
   "repository": {
     "type": "git",
@@ -21,16 +32,14 @@
     "@testing-library/react": "^11.1.0",
     "@types/jest": "^26.0.15",
     "@uiw/react-md-editor": "^1.14.6",
+    "diff-match-patch": "^1.0.5",
     "prismjs": "^1.23.0",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "react-scripts": "4.0.1",
     "web-vitals": "^0.2.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "prepare": "npm run build",
+    "prepare": "rm -rf dist && tsc",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -56,6 +65,7 @@
     "@testing-library/jest-dom": "^5.11.8",
     "@testing-library/react": "^11.2.3",
     "@testing-library/user-event": "^12.8.0",
+    "@types/diff-match-patch": "^1.0.32",
     "@types/jest": "^26.0.20",
     "@types/node": "^12.20.4",
     "@types/react": "^16.14.4",
@@ -65,6 +75,6 @@
     "react-dom": "^17.0.1",
     "react-scripts": "^4.0.1",
     "ts-loader": "^8.0.17",
-    "typescript": "^4.2.2"
+    "typescript": "^4.2.3"
   }
 }
