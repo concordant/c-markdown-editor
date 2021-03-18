@@ -1,6 +1,6 @@
 {
   "name": "@concordant/c-markdown-editor",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "license": "MIT",
   "description": "A Markdown collaborative Editor React Component, to demonstrate the Concordant Platform",
   "keywords": [
