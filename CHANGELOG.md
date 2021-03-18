@@ -7,11 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [Unreleased]
   - Added
-    - Export the markdown editor as a component
-    - Add status file
   - Changed
   - Deprecated
   - Removed
   - Fixed
-    - Selection + insertion loses data
   - Security
+
+- [1.0.6] - 2020-03-18
+  - Added
+    - Export the markdown editor as a component
+    - Add status file
+  - Fixed
+    - Selection + insertion loses data
