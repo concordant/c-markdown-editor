@@ -15,7 +15,7 @@ In order to fix these limitations, we plan to replace it with a single-panel edi
 
 ## Implementation-related limitations
 
-This implementation uses the alpha version of the Concordant platform, and inherits from its limitations (documented in [Concordant client STATUS.md](https://gitlab.inria.fr/concordant/c-client/blob/master/STATUS.md)). This leads to more limitations:
+This implementation uses the alpha version of the Concordant platform, and inherits from its limitations (documented in [Concordant client STATUS.md](https://gitlab.inria.fr/concordant/software/c-client/-/blob/master/README.md)). This leads to more limitations:
 
 - Disconnected operation is not yet supported.
 
