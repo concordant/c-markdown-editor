@@ -4,10 +4,13 @@ import MDEditor from '@uiw/react-md-editor';
 import Submit1Input from './Submit1Input';
 import DiffMatchPatch from 'diff-match-patch';
 
+let CONFIG = require('../config.json');
+
 /**
  * Interface for Concordant MDEditor properties.
  */
 export interface CMDEditorProps {
+    id: string,
     session: any,
     collection: any,
     docName: string
@@ -136,7 +139,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      */
     render() {
         return (
-            <div>
+            <div id={this.props.id}>
                 <div>Current document : {this.state.docName}</div>
                 <Submit1Input inputName="Document" onSubmit={this.handleSubmit.bind(this)} /><br />
                 <MDEditor
