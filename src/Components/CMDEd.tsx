@@ -62,6 +62,10 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
         let valueUI = (typeof value == 'undefined') ? "" : value;
         if (this.state.value === valueUI) return;
 
+        this.setState({
+            value: valueUI
+        });
+
         const dmp = new DiffMatchPatch.diff_match_patch();
         const diffs = dmp.diff_main(this.state.value, valueUI);
 
@@ -85,9 +89,6 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
                         break;
                 }
             }
-            this.setState({
-                value: this.rga.get().toArray().join(""),
-            });
         });
     }
 
