@@ -1,5 +1,6 @@
 {
     "dbName": "concordant",
     "serviceUrl": "http://127.0.0.1:4000",
-    "credentials": "credentials"
+    "credentials": "credentials",
+    "defaultText": "This is the default document text."
 }
