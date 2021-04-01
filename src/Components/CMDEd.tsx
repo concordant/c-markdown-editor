@@ -4,8 +4,6 @@ import MDEditor from '@uiw/react-md-editor';
 import Submit1Input from './Submit1Input';
 import DiffMatchPatch from 'diff-match-patch';
 
-let CONFIG = require('../config.json');
-
 /**
  * Interface for Concordant MDEditor properties.
  */
