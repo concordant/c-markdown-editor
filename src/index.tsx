@@ -31,7 +31,7 @@ ReactDOM.render(
                 The Markdown editor exercises the RGA and LWWMap CRDTs.
             </p>
         </div>
-        <CMDEd id="myeditor" session={session} collection={collection} />
+        <CMDEd session={session} collection={collection} />
         <div className="padding">
             <p className="footer">© CONCORDANT 2021.</p>
         </div>

@@ -1,5 +1,5 @@
 import { client } from '@concordant/c-client';
-import React, { Component } from 'react';
+import React, { Component, createRef } from 'react';
 import MDEditor from '@uiw/react-md-editor';
 import Submit1Input from './Submit1Input';
 import DiffMatchPatch from 'diff-match-patch';
@@ -8,7 +8,6 @@ import DiffMatchPatch from 'diff-match-patch';
  * Interface for Concordant MDEditor properties.
  */
 export interface CMDEditorProps {
-    id: string,
     session: any,
     collection: any,
     docName: string
@@ -35,6 +34,11 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      * RGA of chars representing the editor string value
      */
     private rga: any;
+
+    /**
+     * Ref to the main div DOM element, required for selection management
+     */
+    private nodeRef = createRef<HTMLDivElement>();
 
     public static defaultProps = {
         docName: "Untitled-1"
@@ -98,7 +102,9 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      * It set a timer to refresh cells values.
      */
     componentDidMount() {
-        let textarea = document?.getElementById(this.props.id)?.getElementsByClassName("w-md-editor-text-input")?.item(0) as HTMLInputElement
+        let textarea = this.nodeRef.current
+            ?.getElementsByClassName("w-md-editor-text-input")
+            ?.item(0) as HTMLInputElement;
         this.timerID = setInterval(
             () => {
                 this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
@@ -143,11 +149,11 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
                                 if (idx <= initialPosition[0]) {
                                     if (idx + diff[1].length <= nextPosition[0]) {
                                         // Deletion before the selected text:
-                                        // Move the cursor forward
+                                        // Move the cursor backward
                                         nextPosition[0] -= diff[1].length
                                         nextPosition[1] -= diff[1].length
                                     } else {
-                                        // Deletion starts before the selected text but selected text is removed:
+                                        // Deletion starts before the selected text but selected text is affected:
                                         // Deselect and put the cursor at the beginning of the deletion
                                         nextPosition = [idx, idx]
                                     }
@@ -196,7 +202,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      */
     render() {
         return (
-            <div id={this.props.id}>
+            <div ref={this.nodeRef}>
                 <div>Current document : {this.state.docName}</div>
                 <Submit1Input inputName="Document" onSubmit={this.handleSubmit.bind(this)} /><br />
                 <MDEditor
