@@ -10,7 +10,8 @@ import DiffMatchPatch from 'diff-match-patch';
 export interface CMDEditorProps {
     session: any,
     collection: any,
-    docName: string
+    docName: string,
+    placeholder: string
 }
 
 /**
@@ -41,7 +42,8 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
     private nodeRef = createRef<HTMLDivElement>();
 
     public static defaultProps = {
-        docName: "Untitled-1"
+        docName: "Untitled-1",
+        placeholder: ""
     }
 
     /**
@@ -180,6 +182,10 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
             },
             1000
         );
+        let textarea = this.nodeRef.current
+            ?.getElementsByClassName("w-md-editor-text-input")
+            ?.item(0) as HTMLInputElement;
+        textarea.placeholder = this.props.placeholder
     }
 
     /**
