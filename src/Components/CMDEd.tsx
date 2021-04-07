@@ -108,16 +108,16 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
 
         const dmp = new DiffMatchPatch.diff_match_patch();
         const diffs = dmp.diff_main(this.state.value, newvalue);
-        const initialPosition = [textarea.selectionStart, textarea.selectionEnd]
+        var cursorStart = textarea.selectionStart
+        var cursorEnd = textarea.selectionEnd
 
         this.setState({
             value: newvalue,
         });
 
-        if (initialPosition[0] === null || initialPosition[1] === null) {
+        if (cursorStart === null || cursorEnd === null) {
             return
         }
-        let nextPosition = [initialPosition[0], initialPosition[1]]
 
         let idx = 0
         for (let diff of diffs) {
@@ -126,42 +126,42 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
                     idx += diff[1].length
                     break;
                 case DiffMatchPatch.DIFF_INSERT:
-                    if (idx <= nextPosition[0]) {
+                    if (idx <= cursorStart) {
                         // Insertion before the selected text:
                         // Move the cursor forward
-                        nextPosition[0]+=diff[1].length
-                        nextPosition[1]+=diff[1].length
-                    } else if (idx < nextPosition[1]) {
+                        cursorStart += diff[1].length
+                        cursorEnd += diff[1].length
+                    } else if (idx < cursorEnd) {
                         // Insertion in the selected text
                         // Deselect and put the cursor at the beginning of the previously selected text
-                        nextPosition[1] = nextPosition[0]
+                        cursorEnd = cursorStart
                     }
                     idx += diff[1].length
                     break;
                 case DiffMatchPatch.DIFF_DELETE:
-                    if (idx <= initialPosition[0]) {
-                        if (idx + diff[1].length <= nextPosition[0]) {
+                    if (idx <= cursorStart) {
+                        if (idx + diff[1].length <= cursorStart) {
                             // Deletion before the selected text:
                             // Move the cursor backward
-                            nextPosition[0] -= diff[1].length
-                            nextPosition[1] -= diff[1].length
+                            cursorStart -= diff[1].length
+                            cursorEnd -= diff[1].length
                         } else {
                             // Deletion starts before the selected text but selected text is affected:
                             // Deselect and put the cursor at the beginning of the deletion
-                            nextPosition = [idx, idx]
+                            [cursorStart, cursorEnd] = [idx, idx]
                         }
-                    } else if (idx < initialPosition[1]) {
+                    } else if (idx < cursorEnd) {
                         // Deletion starts in the selected text
                         // Deselect and put the cursor at the beginning of the previously selected text
-                        nextPosition[1] = nextPosition[0]
+                        cursorEnd = cursorStart
                     }
                     break;
             }
-            if (idx > nextPosition[1]) {
+            if (idx > cursorEnd) {
                 break
             }
         }
-        [textarea.selectionStart, textarea.selectionEnd] = nextPosition
+        [textarea.selectionStart, textarea.selectionEnd] = [cursorStart, cursorEnd]
     }
 
     /**
