@@ -216,6 +216,9 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      * returns a React element corresponding to the MDEditor.
      */
     render() {
+        let myToolbar = commands.getCommands()
+        myToolbar.push(this.textToImage)
+        myToolbar.push(this.textToMd)
         return (
             <div ref={this.nodeRef}>
                 <div>Current document : {this.state.docName}</div>
@@ -224,11 +227,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
                     value={this.state.value}
                     onChange={this.valueChanged.bind(this)}
                     height={500}
-                    commands={[commands.bold, commands.italic, commands.strikethrough, commands.hr, commands.title, commands.divider,
-                        commands.link, commands.quote, commands.code, commands.image, commands.divider,
-                        commands.unorderedListCommand, commands.orderedListCommand, commands.checkedListCommand, commands.divider,
-                        commands.codeEdit, commands.codeLive, commands.codePreview, commands.divider,
-                        commands.fullscreen, this.textToImage, this.textToMd]}
+                    commands={myToolbar}
                 />
             </div>
         );
@@ -252,7 +251,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
                 </svg>
         ),
         execute: (state: TextState, api: TextApi) => {
-            const dom = document?.getElementById(this.props.id)?.getElementsByClassName("w-md-editor-content")[0];
+            const dom = this.nodeRef.current?.getElementsByClassName("w-md-editor-content")[0];
             if (dom) {
                 domToImage.toPng(dom, {bgcolor: "white"}).then((dataUrl: string) => {
                     const link = document.createElement("a");
