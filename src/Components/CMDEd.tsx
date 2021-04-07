@@ -1,5 +1,5 @@
 import { client } from '@concordant/c-client';
-import React, { Component } from 'react';
+import React, { Component, createRef } from 'react';
 import MDEditor from '@uiw/react-md-editor';
 import Submit1Input from './Submit1Input';
 import DiffMatchPatch from 'diff-match-patch';
@@ -34,6 +34,11 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      * RGA of chars representing the editor string value
      */
     private rga: any;
+
+    /**
+     * Ref to the main div DOM element, required for selection management
+     */
+    private nodeRef = createRef<HTMLDivElement>();
 
     public static defaultProps = {
         docName: "Untitled-1"
@@ -93,16 +98,84 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
     }
 
     /**
+     * Handler called when a new remote value is received.
+     * @param newvalue New value received
+     */
+    private valueReceived(newvalue: string) {
+        let textarea = this.nodeRef.current
+            ?.getElementsByClassName("w-md-editor-text-input")
+            ?.item(0) as HTMLInputElement;
+
+        const dmp = new DiffMatchPatch.diff_match_patch();
+        const diffs = dmp.diff_main(this.state.value, newvalue);
+        var cursorStart = textarea.selectionStart
+        var cursorEnd = textarea.selectionEnd
+
+        this.setState({
+            value: newvalue,
+        });
+
+        if (cursorStart === null || cursorEnd === null) {
+            return
+        }
+
+        let idx = 0
+        for (let diff of diffs) {
+            switch (diff[0]) {
+                case DiffMatchPatch.DIFF_EQUAL:
+                    idx += diff[1].length
+                    break;
+                case DiffMatchPatch.DIFF_INSERT:
+                    if (idx <= cursorStart) {
+                        // Insertion before the selected text:
+                        // Move the cursor forward
+                        cursorStart += diff[1].length
+                        cursorEnd += diff[1].length
+                    } else if (idx < cursorEnd) {
+                        // Insertion in the selected text
+                        // Deselect and put the cursor at the beginning of the previously selected text
+                        cursorEnd = cursorStart
+                    }
+                    idx += diff[1].length
+                    break;
+                case DiffMatchPatch.DIFF_DELETE:
+                    if (idx <= cursorStart) {
+                        if (idx + diff[1].length <= cursorStart) {
+                            // Deletion before the selected text:
+                            // Move the cursor backward
+                            cursorStart -= diff[1].length
+                            cursorEnd -= diff[1].length
+                        } else {
+                            // Deletion starts before the selected text but selected text is affected:
+                            // Deselect and put the cursor at the beginning of the deletion
+                            [cursorStart, cursorEnd] = [idx, idx]
+                        }
+                    } else if (idx < cursorEnd) {
+                        // Deletion starts in the selected text
+                        // Deselect and put the cursor at the beginning of the previously selected text
+                        cursorEnd = cursorStart
+                    }
+                    break;
+            }
+            if (idx > cursorEnd) {
+                break
+            }
+        }
+        [textarea.selectionStart, textarea.selectionEnd] = [cursorStart, cursorEnd]
+    }
+
+    /**
      * Called after the component is rendered.
-     * It set a timer to refresh cells values.
+     * It set a timer to refresh the contents of the editor.
      */
     componentDidMount() {
         this.timerID = setInterval(
             () => {
                 this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
-                    this.setState({
-                        value: this.rga.get().toArray().join(""),
-                    });
+                    let newvalue = this.rga.get().toArray().join("");
+                    if (newvalue !== this.state.value) {
+                        this.valueReceived(newvalue)
+                    }
                 });
             },
             1000
@@ -136,7 +209,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      */
     render() {
         return (
-            <div>
+            <div ref={this.nodeRef}>
                 <div>Current document : {this.state.docName}</div>
                 <Submit1Input inputName="Document" onSubmit={this.handleSubmit.bind(this)} /><br />
                 <MDEditor
