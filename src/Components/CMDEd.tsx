@@ -98,77 +98,84 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
     }
 
     /**
-     * Called after the component is rendered.
-     * It set a timer to refresh cells values.
+     * Handler called when a new remote value is received.
+     * @param newvalue New value received
      */
-    componentDidMount() {
+    private valueReceived(newvalue: string) {
         let textarea = this.nodeRef.current
             ?.getElementsByClassName("w-md-editor-text-input")
             ?.item(0) as HTMLInputElement;
+
+        const dmp = new DiffMatchPatch.diff_match_patch();
+        const diffs = dmp.diff_main(this.state.value, newvalue);
+        const initialPosition = [textarea.selectionStart, textarea.selectionEnd]
+
+        this.setState({
+            value: newvalue,
+        });
+
+        if (initialPosition[0] === null || initialPosition[1] === null) {
+            return
+        }
+        let nextPosition = [initialPosition[0], initialPosition[1]]
+
+        let idx = 0
+        for (let diff of diffs) {
+            switch (diff[0]) {
+                case DiffMatchPatch.DIFF_EQUAL:
+                    idx += diff[1].length
+                    break;
+                case DiffMatchPatch.DIFF_INSERT:
+                    if (idx <= nextPosition[0]) {
+                        // Insertion before the selected text:
+                        // Move the cursor forward
+                        nextPosition[0]+=diff[1].length
+                        nextPosition[1]+=diff[1].length
+                    } else if (idx < nextPosition[1]) {
+                        // Insertion in the selected text
+                        // Deselect and put the cursor at the beginning of the previously selected text
+                        nextPosition[1] = nextPosition[0]
+                    }
+                    idx += diff[1].length
+                    break;
+                case DiffMatchPatch.DIFF_DELETE:
+                    if (idx <= initialPosition[0]) {
+                        if (idx + diff[1].length <= nextPosition[0]) {
+                            // Deletion before the selected text:
+                            // Move the cursor backward
+                            nextPosition[0] -= diff[1].length
+                            nextPosition[1] -= diff[1].length
+                        } else {
+                            // Deletion starts before the selected text but selected text is affected:
+                            // Deselect and put the cursor at the beginning of the deletion
+                            nextPosition = [idx, idx]
+                        }
+                    } else if (idx < initialPosition[1]) {
+                        // Deletion starts in the selected text
+                        // Deselect and put the cursor at the beginning of the previously selected text
+                        nextPosition[1] = nextPosition[0]
+                    }
+                    break;
+            }
+            if (idx > nextPosition[1]) {
+                break
+            }
+        }
+        [textarea.selectionStart, textarea.selectionEnd] = nextPosition
+    }
+
+    /**
+     * Called after the component is rendered.
+     * It set a timer to refresh the contents of the editor.
+     */
+    componentDidMount() {
         this.timerID = setInterval(
             () => {
                 this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
                     let newvalue = this.rga.get().toArray().join("");
-                    if (newvalue === this.state.value) {
-                        return
+                    if (newvalue !== this.state.value) {
+                        this.valueReceived(newvalue)
                     }
-
-                    const dmp = new DiffMatchPatch.diff_match_patch();
-                    const diffs = dmp.diff_main(this.state.value, newvalue);
-                    const initialPosition = [textarea.selectionStart, textarea.selectionEnd]
-
-                    this.setState({
-                        value: newvalue,
-                    });
-
-                    if (initialPosition[0] === null || initialPosition[1] === null) {
-                        return
-                    }
-                    let nextPosition = [initialPosition[0], initialPosition[1]]
-
-                    let idx = 0
-                    for (let diff of diffs) {
-                        switch (diff[0]) {
-                            case DiffMatchPatch.DIFF_EQUAL:
-                                idx += diff[1].length
-                                break;
-                            case DiffMatchPatch.DIFF_INSERT:
-                                if (idx <= nextPosition[0]) {
-                                    // Insertion before the selected text:
-                                    // Move the cursor forward
-                                    nextPosition[0]+=diff[1].length
-                                    nextPosition[1]+=diff[1].length
-                                } else if (idx < nextPosition[1]) {
-                                    // Insertion in the selected text
-                                    // Deselect and put the cursor at the beginning of the previously selected text
-                                    nextPosition[1] = nextPosition[0]
-                                }
-                                idx += diff[1].length
-                                break;
-                            case DiffMatchPatch.DIFF_DELETE:
-                                if (idx <= initialPosition[0]) {
-                                    if (idx + diff[1].length <= nextPosition[0]) {
-                                        // Deletion before the selected text:
-                                        // Move the cursor backward
-                                        nextPosition[0] -= diff[1].length
-                                        nextPosition[1] -= diff[1].length
-                                    } else {
-                                        // Deletion starts before the selected text but selected text is affected:
-                                        // Deselect and put the cursor at the beginning of the deletion
-                                        nextPosition = [idx, idx]
-                                    }
-                                } else if (idx < initialPosition[1]) {
-                                    // Deletion starts in the selected text
-                                    // Deselect and put the cursor at the beginning of the previously selected text
-                                    nextPosition[1] = nextPosition[0]
-                                }
-                                break;
-                        }
-                        if (idx > nextPosition[1]) {
-                            break
-                        }
-                    }
-                    [textarea.selectionStart, textarea.selectionEnd] = nextPosition
                 });
             },
             1000
