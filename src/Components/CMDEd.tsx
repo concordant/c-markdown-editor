@@ -182,6 +182,9 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
             },
             1000
         );
+        let textarea = this.nodeRef.current
+            ?.getElementsByClassName("w-md-editor-text-input")
+            ?.item(0) as HTMLInputElement;
         textarea.placeholder = this.props.placeholder
     }
 
