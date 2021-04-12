@@ -21,7 +21,9 @@ export interface CMDEditorProps {
  */
 export interface CMDEditorState {
     value: string,
-    docName: string
+    oldValue: string,
+    docName: string,
+    rga: any
 }
 
 /**
@@ -34,11 +36,6 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
     private timerID!: NodeJS.Timeout;
 
     /**
-     * RGA of chars representing the editor string value
-     */
-    private rga: any;
-
-    /**
      * Ref to the main div DOM element, required for selection management
      */
     private nodeRef = createRef<HTMLDivElement>();
@@ -49,74 +46,87 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
     }
 
     /**
-     * Default constructor.
+     * Default constructor
      */
     constructor(props: CMDEditorProps) {
         super(props);
         let value = "";
-        this.rga = this.props.collection.open(this.props.docName, "RGA", false, function () {return});
+        let rga = this.props.collection.open(this.props.docName, "RGA", false, function () {return});
         this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
-            value = this.rga.get().toArray().join("");
+            value = rga.get().toArray().join("");
         });
         this.state = {
             value: value,
-            docName: this.props.docName
+            oldValue: value,
+            docName: this.props.docName,
+            rga: rga
         };
     }
 
     /**
-     * Handler called when there is a change in the underlying MDEditor.
+     * This function is called to update the RGA with the new value from the editor
      */
-    public valueChanged(value: string | undefined) {
-        let valueUI = (typeof value == 'undefined') ? "" : value;
-        if (this.state.value === valueUI) return;
+    private updateRGA() {
+        if (this.state.value !== this.state.oldValue) {
+            const dmp = new DiffMatchPatch.diff_match_patch();
+            const diffs = dmp.diff_main(this.state.oldValue, this.state.value);
 
-        this.setState({
-            value: valueUI
-        });
-
-        const dmp = new DiffMatchPatch.diff_match_patch();
-        const diffs = dmp.diff_main(this.state.value, valueUI);
-
-        this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
-            let idx = 0
-            for (let diff of diffs) {
-                switch (diff[0]) {
-                    case DiffMatchPatch.DIFF_EQUAL:
-                        idx += diff[1].length
-                        break;
-                    case DiffMatchPatch.DIFF_INSERT:
-                        for (let char of diff[1]){
-                            this.rga.insertAt(idx, char);
-                            idx++;
-                        }
-                        break;
-                    case DiffMatchPatch.DIFF_DELETE:
-                        for (var i = 0; i < diff[1].length; i++){
-                            this.rga.removeAt(idx);
-                        }
-                        break;
+            this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
+                let idx = 0
+                for (let diff of diffs) {
+                    switch (diff[0]) {
+                        case DiffMatchPatch.DIFF_EQUAL:
+                            idx += diff[1].length
+                            break;
+                        case DiffMatchPatch.DIFF_INSERT:
+                            for (let char of diff[1]){
+                                this.state.rga.insertAt(idx, char);
+                                idx++;
+                            }
+                            break;
+                        case DiffMatchPatch.DIFF_DELETE:
+                            for (let i = 0; i < diff[1].length; i++){
+                                this.state.rga.removeAt(idx);
+                            }
+                            break;
+                    }
                 }
-            }
-        });
+            });
+            this.setState({
+                oldValue: this.state.value
+            })
+        }
     }
 
     /**
-     * Handler called when a new remote value is received.
+     * This function is called to retrieve the current value of the RGA
+     */
+    private pullValue() {
+        let newValue = ""
+        this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
+            newValue = this.state.rga.get().toArray().join("")
+        });
+        if (newValue !== this.state.value) {
+            this.valueReceived(newValue)
+        }
+    }
+
+    /**
+     * Handler called when a new remote value is received
      * @param newvalue New value received
      */
-    private valueReceived(newvalue: string) {
+    private valueReceived(newValue: string) {
         let textarea = this.nodeRef.current
             ?.getElementsByClassName("w-md-editor-text-input")
             ?.item(0) as HTMLInputElement;
 
         const dmp = new DiffMatchPatch.diff_match_patch();
-        const diffs = dmp.diff_main(this.state.value, newvalue);
-        var cursorStart = textarea.selectionStart
-        var cursorEnd = textarea.selectionEnd
+        const diffs = dmp.diff_main(this.state.value, newValue);
+        let [cursorStart, cursorEnd] = [textarea.selectionStart, textarea.selectionEnd]
 
         this.setState({
-            value: newvalue,
+            value: newValue,
+            oldValue: newValue
         });
 
         if (cursorStart === null || cursorEnd === null) {
@@ -169,25 +179,30 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
     }
 
     /**
+     * Every 3 seconds, update the RGA with the editor's value and retrieves remote changes from the RGA
+     */
+    private routine() {
+        this.timerID = setTimeout(
+            () => {
+                this.updateRGA()
+                this.pullValue()
+                this.routine()
+            },
+            3000
+        );
+    }
+
+    /**
      * Called after the component is rendered.
      * It set a timer to refresh the contents of the editor.
      */
     componentDidMount() {
-        this.timerID = setInterval(
-            () => {
-                this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
-                    let newvalue = this.rga.get().toArray().join("");
-                    if (newvalue !== this.state.value) {
-                        this.valueReceived(newvalue)
-                    }
-                });
-            },
-            1000
-        );
         let textarea = this.nodeRef.current
             ?.getElementsByClassName("w-md-editor-text-input")
             ?.item(0) as HTMLInputElement;
         textarea.placeholder = this.props.placeholder
+
+        this.routine()
     }
 
     /**
@@ -199,16 +214,32 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
     }
 
     /**
+     * Handler called when there is a change in the underlying MDEditor.
+     */
+    public handleChange(value: string | undefined) {
+        let valueUI = (typeof value == 'undefined') ? "" : value;
+        if (this.state.value === valueUI) return;
+
+        this.setState({
+            value: valueUI,
+        });
+    }
+
+    /**
      * This handler is called when a new document name is submit.
      * @param docName Name of the desired document.
      */
     handleSubmit(docName: string) {
         let value = ""
-        this.rga = this.props.collection.open(docName, "RGA", false, function () {return});
+        let rga = this.props.collection.open(docName, "RGA", false, function () {return});
         this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
-            value = this.rga.get().toArray().join("");
+            value = rga.get().toArray().join("");
         });
-        this.setState({value: value, docName: docName});
+        this.setState({
+            value: value,
+            docName: docName,
+            rga: rga
+        });
     }
 
     /**
@@ -217,15 +248,14 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      */
     render() {
         let myToolbar = commands.getCommands()
-        myToolbar.push(this.textToImage)
-        myToolbar.push(this.textToMd)
+        myToolbar.push(this.textToImage, this.textToMd)
         return (
             <div ref={this.nodeRef}>
                 <div>Current document : {this.state.docName}</div>
                 <Submit1Input inputName="Document" onSubmit={this.handleSubmit.bind(this)} /><br />
                 <MDEditor
                     value={this.state.value}
-                    onChange={this.valueChanged.bind(this)}
+                    onChange={this.handleChange.bind(this)}
                     height={500}
                     commands={myToolbar}
                 />
