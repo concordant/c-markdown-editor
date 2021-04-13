@@ -84,6 +84,11 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
         const dmp = new DiffMatchPatch.diff_match_patch();
         const diffs = dmp.diff_main(this.oldValue, this.state.value);
 
+        if (diffs.length === 1 && diffs[0][0] === DiffMatchPatch.DIFF_EQUAL) {
+            // Same value
+            return
+        }
+
         this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
             let idx = 0
             for (let diff of diffs) {
@@ -109,29 +114,25 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
     }
 
     /**
-     * This function is called to retrieve the current value of the RGA
+     * This function is called to retrieve the remote value of the RGA
      */
     private pullValue() {
         let newValue = ""
         this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
             newValue = this.state.rga.get().toArray().join("")
         });
-        if (newValue !== this.state.value) {
-            this.valueReceived(newValue)
-        }
-    }
-
-    /**
-     * Handler called when a new remote value is received
-     * @param newvalue New value received
-     */
-    private valueReceived(newValue: string) {
-        let textarea = this.nodeRef.current
-            ?.getElementsByClassName("w-md-editor-text-input")
-            ?.item(0) as HTMLInputElement;
 
         const dmp = new DiffMatchPatch.diff_match_patch();
         const diffs = dmp.diff_main(this.state.value, newValue);
+
+        if (diffs.length === 1 && diffs[0][0] === DiffMatchPatch.DIFF_EQUAL) {
+            // Same value
+            return
+        }
+
+        let textarea = this.nodeRef.current
+            ?.getElementsByClassName("w-md-editor-text-input")
+            ?.item(0) as HTMLInputElement;
         let [cursorStart, cursorEnd] = [textarea.selectionStart, textarea.selectionEnd]
 
         this.oldValue = newValue
@@ -139,10 +140,19 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
             value: newValue,
         });
 
-        if (cursorStart === null || cursorEnd === null) {
-            return
+        if (cursorStart !== null && cursorEnd !== null) {
+            [textarea.selectionStart, textarea.selectionEnd] = this.updateCursorPosition(diffs, cursorStart, cursorEnd)
         }
+    }
 
+    /**
+     * Calculates the new cursor position according to the changes
+     * @param diffs List of differences
+     * @param cursorStart Initial cursor start position
+     * @param cursorEnd Initial cursor end position
+     * @returns New cursor position
+     */
+    private updateCursorPosition(diffs: any, cursorStart:any , cursorEnd: any) {
         let idx = 0
         for (let diff of diffs) {
             switch (diff[0]) {
@@ -185,7 +195,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
                 break
             }
         }
-        [textarea.selectionStart, textarea.selectionEnd] = [cursorStart, cursorEnd]
+        return [cursorStart, cursorEnd]
     }
 
     /**
