@@ -183,12 +183,12 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
     /**
      * Every 3 seconds, update the RGA with the editor's value and retrieves remote changes from the RGA
      */
-    private routine() {
+    private setSyncTimer() {
         this.timerID = setTimeout(
             () => {
                 this.updateRGA()
                 this.pullValue()
-                this.routine()
+                this.setSyncTimer()
             },
             3000
         );
@@ -204,7 +204,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
             ?.item(0) as HTMLInputElement;
         textarea.placeholder = this.props.placeholder
 
-        this.routine()
+        this.setSyncTimer()
     }
 
     /**
