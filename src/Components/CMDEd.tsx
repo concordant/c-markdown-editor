@@ -21,7 +21,6 @@ export interface CMDEditorProps {
  */
 export interface CMDEditorState {
     value: string,
-    oldValue: string,
     docName: string,
     rga: any
 }
@@ -40,6 +39,11 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      */
     private nodeRef = createRef<HTMLDivElement>();
 
+    /**
+     * RGA value at last update/get
+     */
+    private oldValue : string;
+
     public static defaultProps = {
         docName: "Untitled-1",
         placeholder: ""
@@ -55,9 +59,9 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
         this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
             value = rga.get().toArray().join("");
         });
+        this.oldValue = value;
         this.state = {
             value: value,
-            oldValue: value,
             docName: this.props.docName,
             rga: rga
         };
@@ -67,9 +71,9 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      * This function is called to update the RGA with the new value from the editor
      */
     private updateRGA() {
-        if (this.state.value !== this.state.oldValue) {
+        if (this.state.value !== this.oldValue) {
             const dmp = new DiffMatchPatch.diff_match_patch();
-            const diffs = dmp.diff_main(this.state.oldValue, this.state.value);
+            const diffs = dmp.diff_main(this.oldValue, this.state.value);
 
             this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
                 let idx = 0
@@ -92,9 +96,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
                     }
                 }
             });
-            this.setState({
-                oldValue: this.state.value
-            })
+            this.oldValue = this.state.value
         }
     }
 
@@ -124,9 +126,9 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
         const diffs = dmp.diff_main(this.state.value, newValue);
         let [cursorStart, cursorEnd] = [textarea.selectionStart, textarea.selectionEnd]
 
+        this.oldValue = newValue
         this.setState({
             value: newValue,
-            oldValue: newValue
         });
 
         if (cursorStart === null || cursorEnd === null) {
