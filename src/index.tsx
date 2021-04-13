@@ -4,10 +4,10 @@ import ReactDOM from 'react-dom';
 import { client } from '@concordant/c-client';
 import CMDEd from './Components/CMDEd';
 
-let CONFIG = require('./config.json');
+const CONFIG = require('./config.json');
 
-let session = client.Session.Companion.connect(CONFIG.dbName, CONFIG.serviceUrl, CONFIG.credentials);
-let collection = session.openCollection("mdeditor", false);
+const session = client.Session.Companion.connect(CONFIG.dbName, CONFIG.serviceUrl, CONFIG.credentials);
+const collection = session.openCollection("mdeditor", false);
 
 ReactDOM.render(
     <>

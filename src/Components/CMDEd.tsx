@@ -4,7 +4,7 @@ import MDEditor, {commands, ICommand, TextState, TextApi} from "@uiw/react-md-ed
 import Submit1Input from './Submit1Input';
 import DiffMatchPatch from 'diff-match-patch';
 
-let domToImage = require("dom-to-image-more");
+const domToImage = require("dom-to-image-more");
 
 /**
  * Interface for Concordant MDEditor properties.
@@ -60,7 +60,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
     constructor(props: CMDEditorProps) {
         super(props);
         let value = "";
-        let rga = this.props.collection.open(this.props.docName, "RGA", false, function () {return});
+        const rga = this.props.collection.open(this.props.docName, "RGA", false, function () {return});
         this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
             value = rga.get().toArray().join("");
         });
@@ -91,13 +91,13 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
 
         this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
             let idx = 0
-            for (let diff of diffs) {
+            for (const diff of diffs) {
                 switch (diff[0]) {
                     case DiffMatchPatch.DIFF_EQUAL:
                         idx += diff[1].length
                         break;
                     case DiffMatchPatch.DIFF_INSERT:
-                        for (let char of diff[1]){
+                        for (const char of diff[1]){
                             this.state.rga.insertAt(idx, char);
                             idx++;
                         }
@@ -130,10 +130,10 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
             return
         }
 
-        let textarea = this.nodeRef.current
+        const textarea = this.nodeRef.current
             ?.getElementsByClassName("w-md-editor-text-input")
             ?.item(0) as HTMLInputElement;
-        let [cursorStart, cursorEnd] = [textarea.selectionStart, textarea.selectionEnd]
+        const [cursorStart, cursorEnd] = [textarea.selectionStart, textarea.selectionEnd]
 
         this.oldValue = newValue
         this.setState({
@@ -154,7 +154,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      */
     private updateCursorPosition(diffs: any, cursorStart:any , cursorEnd: any) {
         let idx = 0
-        for (let diff of diffs) {
+        for (const diff of diffs) {
             switch (diff[0]) {
                 case DiffMatchPatch.DIFF_EQUAL:
                     idx += diff[1].length
@@ -217,7 +217,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      * It set a timer to refresh the contents of the editor.
      */
     componentDidMount() {
-        let textarea = this.nodeRef.current
+        const textarea = this.nodeRef.current
             ?.getElementsByClassName("w-md-editor-text-input")
             ?.item(0) as HTMLInputElement;
         textarea.placeholder = this.props.placeholder
@@ -237,7 +237,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      * Handler called when there is a change in the underlying MDEditor.
      */
     public handleChange(value: string | undefined) {
-        let valueUI = (typeof value == 'undefined') ? "" : value;
+        const valueUI = (typeof value == 'undefined') ? "" : value;
         if (this.state.value === valueUI) return;
 
         this.isDirty = true
@@ -253,7 +253,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      */
     handleSubmit(docName: string) {
         let value = ""
-        let rga = this.props.collection.open(docName, "RGA", false, function () {return});
+        const rga = this.props.collection.open(docName, "RGA", false, function () {return});
         this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
             value = rga.get().toArray().join("");
         });
@@ -269,7 +269,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      * returns a React element corresponding to the MDEditor.
      */
     render() {
-        let myToolbar = commands.getCommands()
+        const myToolbar = commands.getCommands()
         myToolbar.push(this.textToImage, this.textToMd)
         return (
             <div ref={this.nodeRef}>
