@@ -23,73 +23,73 @@
  */
 
 body {
-    background-color: white;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
-    line-height: 1.7;
-    margin: 0px;
-    min-width: 650px;
-    text-align: center;
+  background-color: white;
+  font-family: "Montserrat", sans-serif;
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 0px;
+  min-width: 650px;
+  text-align: center;
 }
 
 .header h1 {
-    font-size: 34px;
-    line-height: 30px;
-    text-align: center;
-    font-weight: bold;
+  font-size: 34px;
+  line-height: 30px;
+  text-align: center;
+  font-weight: bold;
 }
 
 .header h2 {
-    font-size: 26px;
-    text-align: center;
-    font-weight: bold;
+  font-size: 26px;
+  text-align: center;
+  font-weight: bold;
 }
 
 p {
-    text-align: justify;
-    text-justify: inter-word;
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 .header {
-    text-align: center;
-    height: 150px;
-    justify-content: center;
-    display: flex;
-    flex-direction: column;
-    line-height: 0px;
-    color: white;
-    margin-top: -10px;
+  text-align: center;
+  height: 150px;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  line-height: 0px;
+  color: white;
+  margin-top: -10px;
 }
 
 .intro {
-    padding-top: 20px;
+  padding-top: 20px;
 }
 
 .padding {
-    padding-top: 30px;
-    padding-bottom: 30px;
+  padding-top: 30px;
+  padding-bottom: 30px;
 }
 
 .reduceWidth {
-    width: 60%;
-    text-align: center;
-    display: inline-block
+  width: 60%;
+  text-align: center;
+  display: inline-block;
 }
 
 .background-turquoise {
-    background-color: #34D6D8;
+  background-color: #34d6d8;
 }
 
 .background-grey {
-    background-color: #F4F4F4;
+  background-color: #f4f4f4;
 }
 
 .background-yellow {
-    background-color: #FFE840;
+  background-color: #ffe840;
 }
 
 .footer {
-    text-align: center;
-    font-size: 11px;
-    color: grey;
+  text-align: center;
+  font-size: 11px;
+  color: grey;
 }
