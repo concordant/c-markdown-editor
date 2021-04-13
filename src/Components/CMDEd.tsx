@@ -44,6 +44,11 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      */
     private oldValue : string;
 
+    /**
+     * Is true if there have been any writes since the last RGA update
+     */
+    private isDirty : boolean;
+
     public static defaultProps = {
         docName: "Untitled-1",
         placeholder: ""
@@ -60,6 +65,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
             value = rga.get().toArray().join("");
         });
         this.oldValue = value;
+        this.isDirty = false;
         this.state = {
             value: value,
             docName: this.props.docName,
@@ -71,33 +77,35 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      * This function is called to update the RGA with the new value from the editor
      */
     private updateRGA() {
-        if (this.state.value !== this.oldValue) {
-            const dmp = new DiffMatchPatch.diff_match_patch();
-            const diffs = dmp.diff_main(this.oldValue, this.state.value);
-
-            this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
-                let idx = 0
-                for (let diff of diffs) {
-                    switch (diff[0]) {
-                        case DiffMatchPatch.DIFF_EQUAL:
-                            idx += diff[1].length
-                            break;
-                        case DiffMatchPatch.DIFF_INSERT:
-                            for (let char of diff[1]){
-                                this.state.rga.insertAt(idx, char);
-                                idx++;
-                            }
-                            break;
-                        case DiffMatchPatch.DIFF_DELETE:
-                            for (let i = 0; i < diff[1].length; i++){
-                                this.state.rga.removeAt(idx);
-                            }
-                            break;
-                    }
-                }
-            });
-            this.oldValue = this.state.value
+        if (!this.isDirty) {
+            return
         }
+
+        const dmp = new DiffMatchPatch.diff_match_patch();
+        const diffs = dmp.diff_main(this.oldValue, this.state.value);
+
+        this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
+            let idx = 0
+            for (let diff of diffs) {
+                switch (diff[0]) {
+                    case DiffMatchPatch.DIFF_EQUAL:
+                        idx += diff[1].length
+                        break;
+                    case DiffMatchPatch.DIFF_INSERT:
+                        for (let char of diff[1]){
+                            this.state.rga.insertAt(idx, char);
+                            idx++;
+                        }
+                        break;
+                    case DiffMatchPatch.DIFF_DELETE:
+                        for (let i = 0; i < diff[1].length; i++){
+                            this.state.rga.removeAt(idx);
+                        }
+                        break;
+                }
+            }
+        });
+        this.oldValue = this.state.value
     }
 
     /**
@@ -221,6 +229,8 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
     public handleChange(value: string | undefined) {
         let valueUI = (typeof value == 'undefined') ? "" : value;
         if (this.state.value === valueUI) return;
+
+        this.isDirty = true
 
         this.setState({
             value: valueUI,
