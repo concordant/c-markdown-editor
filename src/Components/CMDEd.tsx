@@ -2,9 +2,9 @@ import { client } from '@concordant/c-client';
 import React, { Component, createRef } from 'react';
 import MDEditor, {commands, ICommand, TextState, TextApi} from "@uiw/react-md-editor";
 import Submit1Input from './Submit1Input';
-import DiffMatchPatch from 'diff-match-patch';
+import DiffMatchPatch, { Diff } from 'diff-match-patch';
 
-const domToImage = require("dom-to-image-more");
+import domToImage from "dom-to-image-more";
 
 /**
  * Interface for Concordant MDEditor properties.
@@ -152,7 +152,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      * @param cursorEnd Initial cursor end position
      * @returns New cursor position
      */
-    private updateCursorPosition(diffs: any, cursorStart:any , cursorEnd: any) {
+    private updateCursorPosition(diffs: Diff[], cursorStart: number , cursorEnd: number) {
         let idx = 0
         for (const diff of diffs) {
             switch (diff[0]) {
@@ -216,7 +216,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      * Called after the component is rendered.
      * It set a timer to refresh the contents of the editor.
      */
-    componentDidMount() {
+    componentDidMount(): void{
         const textarea = this.nodeRef.current
             ?.getElementsByClassName("w-md-editor-text-input")
             ?.item(0) as HTMLInputElement;
@@ -229,14 +229,14 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      * Called when the compenent is about to be removed from the DOM.
      * It remove the timer set in componentDidMount().
      */
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         clearInterval(this.timerID);
     }
 
     /**
      * Handler called when there is a change in the underlying MDEditor.
      */
-    public handleChange(value: string | undefined) {
+    public handleChange(value: string | undefined): void {
         const valueUI = (typeof value == 'undefined') ? "" : value;
         if (this.state.value === valueUI) return;
 
@@ -251,7 +251,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      * This handler is called when a new document name is submit.
      * @param docName Name of the desired document.
      */
-    handleSubmit(docName: string) {
+    handleSubmit(docName: string): void {
         let value = ""
         const rga = this.props.collection.open(docName, "RGA", false, function () {return});
         this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
@@ -268,7 +268,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
      * The function is called when the content of the editor is updated. It
      * returns a React element corresponding to the MDEditor.
      */
-    render() {
+    render() : JSX.Element {
         const myToolbar = commands.getCommands()
         myToolbar.push(this.textToImage, this.textToMd)
         return (
@@ -302,7 +302,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
 								c0,0.052-0.024,0.097-0.038,0.146h2.954c0.322,0,0.583,0.261,0.583,0.583V17.039z"></path>
                 </svg>
         ),
-        execute: (state: TextState, api: TextApi) => {
+        execute: (_state: TextState, _api: TextApi) => {
             const dom = this.nodeRef.current?.getElementsByClassName("w-md-editor-content")[0];
             if (dom) {
                 domToImage.toPng(dom, {bgcolor: "white"}).then((dataUrl: string) => {
@@ -328,7 +328,7 @@ export default class CMDEditor extends Component<CMDEditorProps, CMDEditorState>
 								h7.394v4.55h4.55V17.394z"></path>
             </svg>
         ),
-        execute: (state: TextState, api: TextApi) => {
+        execute: (_state: TextState, _api: TextApi) => {
             const link = document.createElement('a');
             link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.state.value));
             link.setAttribute('download', this.state.docName + ".md");

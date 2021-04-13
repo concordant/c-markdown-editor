@@ -25,7 +25,7 @@
 import React from 'react';
 
 interface ISubmit1InputProps {
-    onSubmit: any,
+    onSubmit: (docName: string) => void,
     inputName: string
 }
 
@@ -34,7 +34,7 @@ interface ISubmit1InputState {
 }
 
 class Submit1Input extends React.Component<ISubmit1InputProps, ISubmit1InputState> {
-    constructor(props: any) {
+    constructor(props: ISubmit1InputProps) {
         super(props);
         this.state = {value: ""};
 
@@ -46,16 +46,16 @@ class Submit1Input extends React.Component<ISubmit1InputProps, ISubmit1InputStat
      * onChange event handler
      * @param event handled
      */
-    handleChange(event: any) {
+    handleChange(event: React.ChangeEvent<HTMLInputElement>): void {
         this.setState({value: event.target.value});
     }
 
-    handleSubmit(event: any) {
+    handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
         event.preventDefault();
         this.props.onSubmit(this.state.value);
     }
 
-    render() {
+    render() : JSX.Element {
         return (
             <form onSubmit={this.handleSubmit}>
                 <label>

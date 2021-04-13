@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import { client } from '@concordant/c-client';
 import CMDEd from './Components/CMDEd';
 
-const CONFIG = require('./config.json');
+import CONFIG from './config.json';
 
 const session = client.Session.Companion.connect(CONFIG.dbName, CONFIG.serviceUrl, CONFIG.credentials);
 const collection = session.openCollection("mdeditor", false);
@@ -20,7 +20,7 @@ ReactDOM.render(
                 Our collaborative editor enables multiple users to collaborate
                 over a shared text document. It supports both synchronous and
                 asynchronous modes. In synchronous mode, multiple users
-                connected and see each others' edits in real time. In
+                connected and see each others&apos; edits in real time. In
                 asynchronous mode, a user works disconnected, and his/her
                 updates are merged into the shared document when he/she
                 reconnects. Switching between synchronous and asynchrounous

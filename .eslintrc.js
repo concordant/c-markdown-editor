@@ -26,6 +26,8 @@ module.exports = {
     "rules": {
         // already checked by typescript compiler
         "no-undef": "off",
+        // Ignore unused function arguments prefixed with '_'
+        "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]
     },
     "settings": {
         "react": {
