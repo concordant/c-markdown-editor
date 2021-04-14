@@ -47,6 +47,6 @@ NPM targets (set up as scripts in `package.json`) are as follows:
 - `node_modules/` Dependencies,
   created & populated by `npm install`
 - `dist/` JS files,
-  created & populated by `npm prepare` (tsc)
+  created & populated by the `prepare` script (tsc)
 - `build/` demo application production build,
   created & populated by `npm run build`
