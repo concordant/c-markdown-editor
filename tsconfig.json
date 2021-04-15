@@ -2,11 +2,7 @@
   "compilerOptions": {
     "outDir": "./dist/",
     "target": "es5",
-    "lib": [
-      "es2015",
-      "dom",
-      "DOM.Iterable"
-    ],
+    "lib": ["es2015", "dom", "DOM.Iterable"],
     "sourceMap": true,
     "declaration": true,
     "allowJs": true,
@@ -23,7 +19,5 @@
     "isolatedModules": true,
     "noEmit": false
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }
