@@ -1,0 +1,58 @@
+image: node:14.16.0
+
+cache: &global_cache # per-branch cache
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .npm/
+  # make push explicit
+  policy: pull
+
+build:
+  stage: build
+  script:
+    - npm ci --cache .npm --prefer-offline
+    # prepare script is skipped by install/ci when running NPM 6 as root.
+    # This line can be safely removed with NPM 7+ (see NPM Changelog)
+    - npm run prepare
+    # Build demo application
+    # Still some ESlint warnings to be fixed: disable ESlint at this stage
+    - DISABLE_ESLINT_PLUGIN=true npm run build
+  artifacts:
+    paths:
+      - node_modules/
+      - dist/
+      - build/
+    expire_in: 3 days
+  cache:
+    <<: *global_cache
+    policy: pull-push
+
+deliver-internal:
+  stage: deploy
+  when: manual
+  # use only artifacts from build job
+  dependencies:
+    - build
+  before_script:
+    - npm config set
+      @concordant:registry "https://gitlab.inria.fr/api/v4/projects/${CI_PROJECT_ID}/packages/npm/"
+    - npm config set
+      '//gitlab.inria.fr/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken' "${CI_JOB_TOKEN}"
+  script:
+    - npm publish
+
+# Expected environment variables (required to publish)
+# - NPMJS_AUTH_TOKEN: NPMjs credentials
+publish:
+  stage: deploy
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: manual
+  # use only artifacts from build job
+  dependencies:
+    - build
+  before_script:
+    - npm config set
+      '//registry.npmjs.org/:_authToken' "${NPMJS_AUTH_TOKEN}"
+  script:
+    - npm publish --access public
