@@ -125,3 +125,24 @@ stop_review:
     GIT_STRATEGY: none
   script:
     - rm -rf /var/www/demo.concordant.io/html/mdeditor_${CI_ENVIRONMENT_SLUG}
+
+deploy_live:
+  stage: deploy
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: manual
+  tags:
+    - webserver
+  environment:
+    name: live
+    url: https://demo.concordant.io/mdeditor/
+  # use only artifacts from pre-deploy job
+  dependencies:
+    - pre-deploy
+  # cache and repository art not needed: don't download
+  cache: {}
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - rm -rf /var/www/demo.concordant.io/html/mdeditor
+    - mv build /var/www/demo.concordant.io/html/mdeditor
