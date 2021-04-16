@@ -1,5 +1,11 @@
 image: node:14.16.0
 
+stages:
+  - build
+  - test
+  - predeploy
+  - deploy
+
 cache: &global_cache # per-branch cache
   key: ${CI_COMMIT_REF_SLUG}
   paths:
@@ -57,6 +63,27 @@ publish:
   script:
     - npm publish --access public
 
+# Filter out node_modules from build artifacts to speed up deploy.
+# Gitlab 13.10 will allow to use multiple cache instead.
+pre-deploy:
+  stage: predeploy
+  rules:
+    - if: "$CI_COMMIT_BRANCH"
+  # use only artifacts from build job
+  dependencies:
+    - build
+  # cache is not needed: don't download
+  cache: {}
+  # don't download repository content
+  variables:
+    GIT_STRATEGY: none
+  artifacts:
+    paths:
+      - build/
+  # script is required
+  script:
+    - echo Exporting build/…
+
 deploy_review:
   stage: deploy
   rules:
@@ -68,12 +95,11 @@ deploy_review:
     name: review/$CI_COMMIT_REF_NAME
     url: https://demo.concordant.io/mdeditor_${CI_ENVIRONMENT_SLUG}/
     on_stop: stop_review
-  # use only artifacts from build job
+  # use only artifacts from pre-deploy job
   dependencies:
-    - build
-  # cache is not needed: don't download
+    - pre-deploy
+  # cache and repository art not needed: don't download
   cache: {}
-  # don't download repository content
   variables:
     GIT_STRATEGY: none
   script:
