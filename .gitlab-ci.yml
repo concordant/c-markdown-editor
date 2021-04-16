@@ -1,5 +1,11 @@
 image: node:14.16.0
 
+stages:
+  - build
+  - test
+  - predeploy
+  - deploy
+
 cache: &global_cache # per-branch cache
   key: ${CI_COMMIT_REF_SLUG}
   paths:
@@ -56,3 +62,85 @@ publish:
       '//registry.npmjs.org/:_authToken' "${NPMJS_AUTH_TOKEN}"
   script:
     - npm publish --access public
+
+# Filter out node_modules from build artifacts to speed up deploy.
+# Gitlab 13.10 will allow to use multiple cache instead.
+pre-deploy:
+  stage: predeploy
+  rules:
+    - if: "$CI_COMMIT_BRANCH"
+  # use only artifacts from build job
+  dependencies:
+    - build
+  # cache is not needed: don't download
+  cache: {}
+  # don't download repository content
+  variables:
+    GIT_STRATEGY: none
+  artifacts:
+    paths:
+      - build/
+  # script is required
+  script:
+    - echo Exporting build/…
+
+deploy_review:
+  stage: deploy
+  rules:
+    - if: "$CI_COMMIT_BRANCH"
+  tags:
+    - webserver
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    url: https://demo.concordant.io/mdeditor_${CI_ENVIRONMENT_SLUG}/
+    on_stop: stop_review
+  # use only artifacts from pre-deploy job
+  dependencies:
+    - pre-deploy
+  # cache and repository art not needed: don't download
+  cache: {}
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - rm -rf /var/www/demo.concordant.io/html/mdeditor_${CI_ENVIRONMENT_SLUG}
+    - mv build /var/www/demo.concordant.io/html/mdeditor_${CI_ENVIRONMENT_SLUG}
+
+stop_review:
+  stage: deploy
+  rules:
+    - if: "$CI_COMMIT_BRANCH"
+      when: manual
+      allow_failure: true
+  tags:
+    - webserver
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    action: stop
+  # artifacts, cache and repository are not needed: don't download
+  dependencies: []
+  cache: {}
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - rm -rf /var/www/demo.concordant.io/html/mdeditor_${CI_ENVIRONMENT_SLUG}
+
+deploy_live:
+  stage: deploy
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: manual
+  tags:
+    - webserver
+  environment:
+    name: live
+    url: https://demo.concordant.io/mdeditor/
+  # use only artifacts from pre-deploy job
+  dependencies:
+    - pre-deploy
+  # cache and repository art not needed: don't download
+  cache: {}
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - rm -rf /var/www/demo.concordant.io/html/mdeditor
+    - mv build /var/www/demo.concordant.io/html/mdeditor
