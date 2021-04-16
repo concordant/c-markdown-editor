@@ -56,3 +56,31 @@ publish:
       '//registry.npmjs.org/:_authToken' "${NPMJS_AUTH_TOKEN}"
   script:
     - npm publish --access public
+
+deploy_review:
+  stage: deploy
+  rules:
+    - if: "$CI_COMMIT_BRANCH"
+      when: manual
+  tags:
+    - webserver
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    url: https://demo.concordant.io/mdeditor_${CI_ENVIRONMENT_SLUG}/
+    on_stop: stop_review
+  script:
+    - rm -rf /var/www/demo.concordant.io/html/mdeditor_${CI_ENVIRONMENT_SLUG}
+    - mv build /var/www/demo.concordant.io/html/mdeditor_${CI_ENVIRONMENT_SLUG}
+
+stop_review:
+  stage: deploy
+  rules:
+    - if: "$CI_COMMIT_BRANCH"
+      when: manual
+  tags:
+    - webserver
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    action: stop
+  script:
+    - rm -rf /var/www/demo.concordant.io/html/mdeditor_${CI_ENVIRONMENT_SLUG}
