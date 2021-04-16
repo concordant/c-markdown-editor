@@ -25,6 +25,5 @@ This implementation uses the alpha version of the Concordant platform, and inher
 We are aware of the following bugs:
 
 - Responsiveness degrades for large documents.   
-- When distant modifications are merged locally, a rendering of the UI component is triggered, and user's cursor is placed at the end of the document. This is not convenient if you are at the same moment editing.
 
 We are working actively on fixing the bugs.
