@@ -89,6 +89,7 @@ deploy_review:
   rules:
     - if: "$CI_COMMIT_BRANCH"
       when: manual
+      allow_failure: true
   tags:
     - webserver
   environment:
@@ -111,6 +112,7 @@ stop_review:
   rules:
     - if: "$CI_COMMIT_BRANCH"
       when: manual
+      allow_failure: true
   tags:
     - webserver
   environment:
