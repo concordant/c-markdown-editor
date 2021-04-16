@@ -1,6 +1,6 @@
 # Status of C-Markdown Editor
 
-16 March 2021
+16 April 2021
 
 This is an alpha version of a collaborative text editor. Its aim is to provide an example of a collaborative application leveraging the Concordant vision. Features, performance, and user-friendliness have been secondary considerations.
 
@@ -15,15 +15,16 @@ In order to fix these limitations, we plan to replace it with a single-panel edi
 
 ## Implementation-related limitations
 
-This implementation uses the alpha version of the Concordant platform, and inherits from its limitations (documented in [Concordant client STATUS.md](https://gitlab.inria.fr/concordant/software/c-client/-/blob/master/README.md)). This leads to more limitations:
+This implementation uses the alpha version of the Concordant platform, and inherits from its limitations (documented in [Concordant client STATUS.md](https://gitlab.inria.fr/concordant/software/c-client/-/blob/master/STATUS.md)). This leads to more limitations:
 
-- Disconnected operation is not yet supported.
+- Disconnected operation is not yet supported.  This will be fixed by moving the c-service into a service worker.
+- Altough interactive performance is good, it degrades badly for larger documents (note that deleted characters remain in the document state as tombstones).  This will be fixed by enabling support for delta propagation. 
 
 ## Bugs
 
 We are aware of the following bugs:
 
-- It’s slow. There is excessive lag between typing a character and its rendering.
+- Responsiveness degrades for large documents.   
 - When distant modifications are merged locally, a rendering of the UI component is triggered, and user's cursor is placed at the end of the document. This is not convenient if you are at the same moment editing.
 
 We are working actively on fixing the bugs.
