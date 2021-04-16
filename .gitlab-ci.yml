@@ -88,8 +88,6 @@ deploy_review:
   stage: deploy
   rules:
     - if: "$CI_COMMIT_BRANCH"
-      when: manual
-      allow_failure: true
   tags:
     - webserver
   environment:
