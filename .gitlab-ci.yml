@@ -68,6 +68,14 @@ deploy_review:
     name: review/$CI_COMMIT_REF_NAME
     url: https://demo.concordant.io/mdeditor_${CI_ENVIRONMENT_SLUG}/
     on_stop: stop_review
+  # use only artifacts from build job
+  dependencies:
+    - build
+  # cache is not needed: don't download
+  cache: {}
+  # don't download repository content
+  variables:
+    GIT_STRATEGY: none
   script:
     - rm -rf /var/www/demo.concordant.io/html/mdeditor_${CI_ENVIRONMENT_SLUG}
     - mv build /var/www/demo.concordant.io/html/mdeditor_${CI_ENVIRONMENT_SLUG}
@@ -82,5 +90,10 @@ stop_review:
   environment:
     name: review/$CI_COMMIT_REF_NAME
     action: stop
+  # artifacts, cache and repository are not needed: don't download
+  dependencies: []
+  cache: {}
+  variables:
+    GIT_STRATEGY: none
   script:
     - rm -rf /var/www/demo.concordant.io/html/mdeditor_${CI_ENVIRONMENT_SLUG}
