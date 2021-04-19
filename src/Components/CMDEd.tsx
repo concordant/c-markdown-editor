@@ -281,6 +281,8 @@ export default class CMDEditor extends Component<
     this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
       value = rga.get().toArray().join("");
     });
+    this.oldValue = value;
+    this.isDirty = false;
     this.setState({
       value: value,
       docName: docName,
