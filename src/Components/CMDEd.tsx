@@ -15,8 +15,8 @@ import domToImage from "dom-to-image-more";
  * Interface for Concordant MDEditor properties.
  */
 export interface CMDEditorProps {
-  session: any;
-  collection: any;
+  session: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  collection: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   docName: string;
   placeholder: string;
 }
@@ -27,7 +27,7 @@ export interface CMDEditorProps {
 export interface CMDEditorState {
   value: string;
   docName: string;
-  rga: any;
+  rga: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 /**
