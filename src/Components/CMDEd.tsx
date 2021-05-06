@@ -134,6 +134,7 @@ export default class CMDEditor extends Component<
    * This function is called to retrieve the remote value of the RGA
    */
   private pullValue() {
+    this.props.collection.pull(client.utils.ConsistencyLevel.None);
     let newValue = "";
     this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
       newValue = this.state.rga.get().toArray().join("");
