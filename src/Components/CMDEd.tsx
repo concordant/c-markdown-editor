@@ -28,6 +28,7 @@ export interface CMDEditorState {
   value: string;
   docName: string;
   rga: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  isConnected: boolean;
 }
 
 /**
@@ -85,6 +86,7 @@ export default class CMDEditor extends Component<
       value: value,
       docName: this.props.docName,
       rga: rga,
+      isConnected: true,
     };
   }
 
@@ -257,6 +259,18 @@ export default class CMDEditor extends Component<
   }
 
   /**
+   * This function is used to simulate the offline mode.
+   */
+  switchConnection(): void {
+    if (this.state.isConnected) {
+      clearInterval(this.timerID);
+    } else {
+      this.setSyncTimer();
+    }
+    this.setState({ isConnected: !this.state.isConnected });
+  }
+
+  /**
    * Handler called when there is a change in the underlying MDEditor.
    */
   public handleChange(value: string | undefined): void {
@@ -279,9 +293,11 @@ export default class CMDEditor extends Component<
     const rga = this.props.collection.open(docName, "RGA", false, function () {
       return;
     });
-    this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
-      value = rga.get().toArray().join("");
-    });
+    if (this.state.isConnected) {
+      this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
+        value = rga.get().toArray().join("");
+      });
+    }
     this.oldValue = value;
     this.isDirty = false;
     this.setState({
@@ -305,6 +321,12 @@ export default class CMDEditor extends Component<
           inputName="Document"
           onSubmit={this.handleSubmit.bind(this)}
         />
+        <br />
+        <div>
+          <button onClick={() => this.switchConnection()}>
+            {this.state.isConnected ? "Disconnect" : "Connect"}
+          </button>
+        </div>
         <br />
         <MDEditor
           value={this.state.value}
