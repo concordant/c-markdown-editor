@@ -4,11 +4,10 @@ import MDEditor, {
   commands,
   ICommand,
   TextState,
-  TextApi,
+  TextAreaTextApi,
 } from "@uiw/react-md-editor";
 import Submit1Input from "./Submit1Input";
 import DiffMatchPatch, { Diff } from "diff-match-patch";
-
 import domToImage from "dom-to-image-more";
 
 /**
@@ -162,10 +161,8 @@ export default class CMDEditor extends Component<
     });
 
     if (cursorStart !== null && cursorEnd !== null) {
-      [
-        textarea.selectionStart,
-        textarea.selectionEnd,
-      ] = this.updateCursorPosition(diffs, cursorStart, cursorEnd);
+      [textarea.selectionStart, textarea.selectionEnd] =
+        this.updateCursorPosition(diffs, cursorStart, cursorEnd);
     }
   }
 
@@ -358,7 +355,7 @@ export default class CMDEditor extends Component<
         ></path>
       </svg>
     ),
-    execute: (_state: TextState, _api: TextApi) => {
+    execute: (_state: TextState, _api: TextAreaTextApi) => {
       const dom = this.nodeRef.current?.getElementsByClassName(
         "w-md-editor-content"
       )[0];
@@ -389,7 +386,7 @@ export default class CMDEditor extends Component<
         ></path>
       </svg>
     ),
-    execute: (_state: TextState, _api: TextApi) => {
+    execute: (_state: TextState, _api: TextAreaTextApi) => {
       const link = document.createElement("a");
       link.setAttribute(
         "href",
