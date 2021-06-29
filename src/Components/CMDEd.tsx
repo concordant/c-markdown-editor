@@ -68,6 +68,13 @@ export default class CMDEditor extends Component<
   };
 
   /**
+   * Callback used when new update received.
+   */
+  private updateCallback() {
+    this.pullValue();
+  }
+
+  /**
    * Default constructor.
    */
   constructor(props: CMDEditorProps) {
@@ -77,9 +84,7 @@ export default class CMDEditor extends Component<
       this.props.docName,
       "RGA",
       false,
-      function () {
-        return;
-      }
+      this.updateCallback.bind(this)
     );
     this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
       value = rga.get().toArray().join("");
@@ -318,9 +323,12 @@ export default class CMDEditor extends Component<
    */
   handleSubmit(docName: string): void {
     let value = "";
-    const rga = this.props.collection.open(docName, "RGA", false, function () {
-      return;
-    });
+    const rga = this.props.collection.open(
+      docName,
+      "RGA",
+      false,
+      this.updateCallback.bind(this)
+    );
     if (this.state.isConnected) {
       this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
         value = rga.get().toArray().join("");
