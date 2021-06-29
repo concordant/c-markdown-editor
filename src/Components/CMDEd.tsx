@@ -38,9 +38,14 @@ export default class CMDEditor extends Component<
   CMDEditorState
 > {
   /**
-   * Timer use for refresh
+   * Timer for pushing update.
    */
-  private timerID!: NodeJS.Timeout;
+  private timerPush!: NodeJS.Timeout;
+
+  /**
+   * Timer for polling update.
+   */
+  private timerPull!: NodeJS.Timeout;
 
   /**
    * Ref to the main div DOM element, required for selection management.
@@ -93,7 +98,12 @@ export default class CMDEditor extends Component<
    * This function is called to update the RGA with the new value from the editor.
    */
   private updateRGA() {
+    if (!this.state.isConnected) {
+      return;
+    }
+    clearTimeout(this.timerPush);
     if (!this.isDirty) {
+      this.setPushTimer();
       return;
     }
 
@@ -102,6 +112,8 @@ export default class CMDEditor extends Component<
 
     if (diffs.length === 1 && diffs[0][0] === DiffMatchPatch.DIFF_EQUAL) {
       // Same value
+      this.isDirty = false;
+      this.setPushTimer();
       return;
     }
 
@@ -127,12 +139,19 @@ export default class CMDEditor extends Component<
       }
     });
     this.oldValue = this.state.value;
+    this.isDirty = false;
+    this.setPushTimer();
   }
 
   /**
    * This function is called to retrieve the remote value of the RGA.
    */
   private pullValue() {
+    if (!this.state.isConnected) {
+      return;
+    }
+    this.updateRGA();
+    clearTimeout(this.timerPull);
     this.props.collection.pull(client.utils.ConsistencyLevel.None);
     let newValue = "";
     this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
@@ -144,6 +163,7 @@ export default class CMDEditor extends Component<
 
     if (diffs.length === 1 && diffs[0][0] === DiffMatchPatch.DIFF_EQUAL) {
       // Same value
+      this.setPullTimer();
       return;
     }
 
@@ -225,14 +245,21 @@ export default class CMDEditor extends Component<
   }
 
   /**
-   * Every 3 seconds, update the RGA with the editor's value and retrieves remote changes from the RGA
+   * Every 3 seconds, update the RGA with the editor's value.
    */
-  private setSyncTimer() {
-    this.timerID = setTimeout(() => {
+  private setPushTimer() {
+    this.timerPush = setTimeout(() => {
       this.updateRGA();
-      this.pullValue();
-      this.setSyncTimer();
     }, 3000);
+  }
+
+  /**
+   * Backup function to retrieves remote changes from the RGA, every 30 secondes.
+   */
+  private setPullTimer() {
+    this.timerPull = setTimeout(() => {
+      this.props.collection.forceGet(this.state.rga);
+    }, 30000);
   }
 
   /**
@@ -244,8 +271,8 @@ export default class CMDEditor extends Component<
       ?.getElementsByClassName("w-md-editor-text-input")
       ?.item(0) as HTMLInputElement;
     textarea.placeholder = this.props.placeholder;
-
-    this.setSyncTimer();
+    this.setPushTimer();
+    this.setPullTimer();
   }
 
   /**
@@ -253,7 +280,8 @@ export default class CMDEditor extends Component<
    * It remove the timer set in componentDidMount().
    */
   componentWillUnmount(): void {
-    clearInterval(this.timerID);
+    clearTimeout(this.timerPush);
+    clearTimeout(this.timerPull);
   }
 
   /**
@@ -261,9 +289,11 @@ export default class CMDEditor extends Component<
    */
   switchConnection(): void {
     if (this.state.isConnected) {
-      clearInterval(this.timerID);
+      clearTimeout(this.timerPush);
+      clearTimeout(this.timerPull);
     } else {
-      this.setSyncTimer();
+      this.setPushTimer();
+      this.setPullTimer();
     }
     this.setState({ isConnected: !this.state.isConnected });
   }
