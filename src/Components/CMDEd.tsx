@@ -31,7 +31,7 @@ export interface CMDEditorState {
 }
 
 /**
- * Concordant Markdone Editor, a collaborative version of the MDEditor component
+ * Concordant Markdone Editor, a collaborative version of the MDEditor component.
  **/
 export default class CMDEditor extends Component<
   CMDEditorProps,
@@ -43,17 +43,17 @@ export default class CMDEditor extends Component<
   private timerID!: NodeJS.Timeout;
 
   /**
-   * Ref to the main div DOM element, required for selection management
+   * Ref to the main div DOM element, required for selection management.
    */
   private nodeRef = createRef<HTMLDivElement>();
 
   /**
-   * RGA value at last update/get
+   * RGA value at last update/get.
    */
   private oldValue: string;
 
   /**
-   * Is true if there have been any writes since the last RGA update
+   * Is true if there have been any writes since the last RGA update.
    */
   private isDirty: boolean;
 
@@ -63,7 +63,7 @@ export default class CMDEditor extends Component<
   };
 
   /**
-   * Default constructor
+   * Default constructor.
    */
   constructor(props: CMDEditorProps) {
     super(props);
@@ -90,7 +90,7 @@ export default class CMDEditor extends Component<
   }
 
   /**
-   * This function is called to update the RGA with the new value from the editor
+   * This function is called to update the RGA with the new value from the editor.
    */
   private updateRGA() {
     if (!this.isDirty) {
@@ -130,7 +130,7 @@ export default class CMDEditor extends Component<
   }
 
   /**
-   * This function is called to retrieve the remote value of the RGA
+   * This function is called to retrieve the remote value of the RGA.
    */
   private pullValue() {
     this.props.collection.pull(client.utils.ConsistencyLevel.None);
@@ -164,14 +164,15 @@ export default class CMDEditor extends Component<
       [textarea.selectionStart, textarea.selectionEnd] =
         this.updateCursorPosition(diffs, cursorStart, cursorEnd);
     }
+    this.setPullTimer();
   }
 
   /**
-   * Calculates the new cursor position according to the changes
-   * @param diffs List of differences
-   * @param cursorStart Initial cursor start position
-   * @param cursorEnd Initial cursor end position
-   * @returns New cursor position
+   * Calculates the new cursor position according to the changes.
+   * @param diffs List of differences.
+   * @param cursorStart Initial cursor start position.
+   * @param cursorEnd Initial cursor end position.
+   * @returns New cursor position.
    */
   private updateCursorPosition(
     diffs: Diff[],
@@ -305,8 +306,8 @@ export default class CMDEditor extends Component<
   }
 
   /**
-   * The function is called when the content of the editor is updated. It
-   * returns a React element corresponding to the MDEditor.
+   * The function is called when the content of the editor is updated.
+   * It returns a React element corresponding to the MDEditor.
    */
   render(): JSX.Element {
     const myToolbar = commands.getCommands();
