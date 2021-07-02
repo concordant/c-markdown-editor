@@ -10,6 +10,9 @@ import Submit1Input from "./Submit1Input";
 import DiffMatchPatch, { Diff } from "diff-match-patch";
 import domToImage from "dom-to-image-more";
 
+const PUSHTIMEOUT = 3000;
+const POLLTIMEOUT = 60000;
+
 /**
  * Interface for Concordant MDEditor properties.
  */
@@ -250,21 +253,21 @@ export default class CMDEditor extends Component<
   }
 
   /**
-   * Every 3 seconds, update the RGA with the editor's value.
+   * Updates the RGA with the editor's value after the timeout.
    */
   private setPushTimer() {
     this.timerPush = setTimeout(() => {
       this.updateRGA();
-    }, 3000);
+    }, PUSHTIMEOUT);
   }
 
   /**
-   * Backup function to retrieves remote changes from the RGA, every 30 secondes.
+   * Retrieves remote changes from the RGA after the timeout.
    */
   private setPullTimer() {
     this.timerPull = setTimeout(() => {
       this.props.collection.forceGet(this.state.rga);
-    }, 30000);
+    }, POLLTIMEOUT);
   }
 
   /**
@@ -276,8 +279,7 @@ export default class CMDEditor extends Component<
       ?.getElementsByClassName("w-md-editor-text-input")
       ?.item(0) as HTMLInputElement;
     textarea.placeholder = this.props.placeholder;
-    this.setPushTimer();
-    this.setPullTimer();
+    this.pullValue();
   }
 
   /**
@@ -293,14 +295,13 @@ export default class CMDEditor extends Component<
    * This function is used to simulate the offline mode.
    */
   switchConnection(): void {
+    this.setState({ isConnected: !this.state.isConnected });
     if (this.state.isConnected) {
+      this.pullValue();
+    } else {
       clearTimeout(this.timerPush);
       clearTimeout(this.timerPull);
-    } else {
-      this.setPushTimer();
-      this.setPullTimer();
     }
-    this.setState({ isConnected: !this.state.isConnected });
   }
 
   /**
