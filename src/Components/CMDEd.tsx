@@ -267,6 +267,7 @@ export default class CMDEditor extends Component<
   private setPullTimer() {
     this.timerPull = setTimeout(() => {
       this.props.collection.forceGet(this.state.rga);
+      this.setPullTimer();
     }, POLLTIMEOUT);
   }
 
