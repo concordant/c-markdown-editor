@@ -280,7 +280,7 @@ export default class CMDEditor extends Component<
       ?.getElementsByClassName("w-md-editor-text-input")
       ?.item(0) as HTMLInputElement;
     textarea.placeholder = this.props.placeholder;
-    this.pullValue();
+    this.setGetTimeout();
   }
 
   /**
