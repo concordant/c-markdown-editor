@@ -10,8 +10,8 @@ import Submit1Input from "./Submit1Input";
 import DiffMatchPatch, { Diff } from "diff-match-patch";
 import domToImage from "dom-to-image-more";
 
-const PUSHTIMEOUT = 3000;
-const POLLTIMEOUT = 60000;
+const TIMEOUTPUSH = 3000;
+const TIMEOUTGET = 60000;
 
 /**
  * Interface for Concordant MDEditor properties.
@@ -43,12 +43,12 @@ export default class CMDEditor extends Component<
   /**
    * Timer for pushing update.
    */
-  private timerPush!: NodeJS.Timeout;
+  private timeoutPush!: NodeJS.Timeout;
 
   /**
-   * Timer for polling update.
+   * Timer for getting update.
    */
-  private timerPull!: NodeJS.Timeout;
+  private timeoutGet!: NodeJS.Timeout;
 
   /**
    * Ref to the main div DOM element, required for selection management.
@@ -109,9 +109,9 @@ export default class CMDEditor extends Component<
     if (!this.state.isConnected) {
       return;
     }
-    clearTimeout(this.timerPush);
+    clearTimeout(this.timeoutPush);
     if (!this.isDirty) {
-      this.setPushTimer();
+      this.setPushTimeout();
       return;
     }
 
@@ -121,7 +121,7 @@ export default class CMDEditor extends Component<
     if (diffs.length === 1 && diffs[0][0] === DiffMatchPatch.DIFF_EQUAL) {
       // Same value
       this.isDirty = false;
-      this.setPushTimer();
+      this.setPushTimeout();
       return;
     }
 
@@ -148,7 +148,7 @@ export default class CMDEditor extends Component<
     });
     this.oldValue = this.state.value;
     this.isDirty = false;
-    this.setPushTimer();
+    this.setPushTimeout();
   }
 
   /**
@@ -159,7 +159,7 @@ export default class CMDEditor extends Component<
       return;
     }
     this.updateRGA();
-    clearTimeout(this.timerPull);
+    clearTimeout(this.timeoutGet);
     this.props.collection.pull(client.utils.ConsistencyLevel.None);
     let newValue = "";
     this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
@@ -171,7 +171,7 @@ export default class CMDEditor extends Component<
 
     if (diffs.length === 1 && diffs[0][0] === DiffMatchPatch.DIFF_EQUAL) {
       // Same value
-      this.setPullTimer();
+      this.setGetTimeout();
       return;
     }
 
@@ -192,7 +192,7 @@ export default class CMDEditor extends Component<
       [textarea.selectionStart, textarea.selectionEnd] =
         this.updateCursorPosition(diffs, cursorStart, cursorEnd);
     }
-    this.setPullTimer();
+    this.setGetTimeout();
   }
 
   /**
@@ -255,20 +255,20 @@ export default class CMDEditor extends Component<
   /**
    * Updates the RGA with the editor's value after the timeout.
    */
-  private setPushTimer() {
-    this.timerPush = setTimeout(() => {
+  private setPushTimeout() {
+    this.timeoutPush = setTimeout(() => {
       this.updateRGA();
-    }, PUSHTIMEOUT);
+    }, TIMEOUTPUSH);
   }
 
   /**
    * Retrieves remote changes from the RGA after the timeout.
    */
-  private setPullTimer() {
-    this.timerPull = setTimeout(() => {
+  private setGetTimeout() {
+    this.timeoutGet = setTimeout(() => {
       this.props.collection.forceGet(this.state.rga);
-      this.setPullTimer();
-    }, POLLTIMEOUT);
+      this.setGetTimeout();
+    }, TIMEOUTGET);
   }
 
   /**
@@ -288,8 +288,8 @@ export default class CMDEditor extends Component<
    * It remove the timer set in componentDidMount().
    */
   componentWillUnmount(): void {
-    clearTimeout(this.timerPush);
-    clearTimeout(this.timerPull);
+    clearTimeout(this.timeoutPush);
+    clearTimeout(this.timeoutGet);
   }
 
   /**
@@ -300,8 +300,8 @@ export default class CMDEditor extends Component<
     if (this.state.isConnected) {
       this.pullValue();
     } else {
-      clearTimeout(this.timerPush);
-      clearTimeout(this.timerPull);
+      clearTimeout(this.timeoutPush);
+      clearTimeout(this.timeoutGet);
     }
   }
 
