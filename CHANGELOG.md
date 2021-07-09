@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Separate the timer into two timers: pushing/polling
+- Separate the timeout into two timeout: pushing/polling
 - Remove frequent pooling but keep a backup call when it has not received a new version for a while
 
 ### Deprecated
@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
-## [1.1.0] - 2020-05-17
+## [1.1.0] - 2021-05-17
 
 ### Added
 
@@ -37,7 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix concurrency between edits and remote updates
 
-## [1.0.7] - 2020-04-17
+## [1.0.7] - 2021-04-17
 
 ### Added
 
@@ -53,7 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replace unnecessary calls to rga.get
 - Fix the cursor position when merging text
 
-## [1.0.6] - 2020-03-18
+## [1.0.6] - 2021-03-18
 
 ### Added
 
