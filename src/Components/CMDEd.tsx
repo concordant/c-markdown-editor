@@ -296,13 +296,14 @@ export default class CMDEditor extends Component<
    * This function is used to simulate the offline mode.
    */
   switchConnection(): void {
-    this.setState({ isConnected: !this.state.isConnected });
-    if (this.state.isConnected) {
-      this.pullValue();
-    } else {
-      clearTimeout(this.timeoutPush);
-      clearTimeout(this.timeoutGet);
-    }
+    this.setState({ isConnected: !this.state.isConnected }, () => {
+      if (this.state.isConnected) {
+        this.pullValue();
+      } else {
+        clearTimeout(this.timeoutPush);
+        clearTimeout(this.timeoutGet);
+      }
+    });
   }
 
   /**
