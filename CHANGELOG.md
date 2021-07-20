@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Separate the timeout into two timeout: pushing/polling
 - Remove frequent pooling but keep a backup call when it has not received a new version for a while
+- Set push timeout only when there has been a write
 
 ### Deprecated
 
