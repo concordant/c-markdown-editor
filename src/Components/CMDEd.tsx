@@ -111,7 +111,6 @@ export default class CMDEditor extends Component<
     }
     clearTimeout(this.timeoutPush);
     if (!this.isDirty) {
-      this.setPushTimeout();
       return;
     }
 
@@ -121,7 +120,6 @@ export default class CMDEditor extends Component<
     if (diffs.length === 1 && diffs[0][0] === DiffMatchPatch.DIFF_EQUAL) {
       // Same value
       this.isDirty = false;
-      this.setPushTimeout();
       return;
     }
 
@@ -148,7 +146,6 @@ export default class CMDEditor extends Component<
     });
     this.oldValue = this.state.value;
     this.isDirty = false;
-    this.setPushTimeout();
   }
 
   /**
@@ -313,7 +310,10 @@ export default class CMDEditor extends Component<
     const valueUI = typeof value == "undefined" ? "" : value;
     if (this.state.value === valueUI) return;
 
-    this.isDirty = true;
+    if (!this.isDirty) {
+      this.isDirty = true;
+      this.setPushTimeout();
+    }
 
     this.setState({
       value: valueUI,
