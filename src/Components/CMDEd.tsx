@@ -74,7 +74,9 @@ export default class CMDEditor extends Component<
    * Callback used when new update received.
    */
   private updateCallback() {
+    clearTimeout(this.timeoutGet);
     this.pullValue();
+    this.setGetTimeout();
   }
 
   /**
@@ -156,7 +158,6 @@ export default class CMDEditor extends Component<
       return;
     }
     this.updateRGA();
-    clearTimeout(this.timeoutGet);
     this.props.collection.pull(client.utils.ConsistencyLevel.None);
     let newValue = "";
     this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
@@ -168,7 +169,6 @@ export default class CMDEditor extends Component<
 
     if (diffs.length === 1 && diffs[0][0] === DiffMatchPatch.DIFF_EQUAL) {
       // Same value
-      this.setGetTimeout();
       return;
     }
 
@@ -189,7 +189,6 @@ export default class CMDEditor extends Component<
       [textarea.selectionStart, textarea.selectionEnd] =
         this.updateCursorPosition(diffs, cursorStart, cursorEnd);
     }
-    this.setGetTimeout();
   }
 
   /**
@@ -295,7 +294,7 @@ export default class CMDEditor extends Component<
   switchConnection(): void {
     this.setState({ isConnected: !this.state.isConnected }, () => {
       if (this.state.isConnected) {
-        this.pullValue();
+        this.updateCallback();
       } else {
         clearTimeout(this.timeoutPush);
         clearTimeout(this.timeoutGet);
