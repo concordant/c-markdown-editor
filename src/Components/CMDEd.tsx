@@ -4,12 +4,14 @@ import MDEditor, {
   commands,
   ICommand,
   TextState,
-  TextApi,
+  TextAreaTextApi,
 } from "@uiw/react-md-editor";
 import Submit1Input from "./Submit1Input";
 import DiffMatchPatch, { Diff } from "diff-match-patch";
-
 import domToImage from "dom-to-image-more";
+
+const TIMEOUTPUSH = 3000;
+const TIMEOUTGET = 60000;
 
 /**
  * Interface for Concordant MDEditor properties.
@@ -32,29 +34,34 @@ export interface CMDEditorState {
 }
 
 /**
- * Concordant Markdone Editor, a collaborative version of the MDEditor component
+ * Concordant Markdone Editor, a collaborative version of the MDEditor component.
  **/
 export default class CMDEditor extends Component<
   CMDEditorProps,
   CMDEditorState
 > {
   /**
-   * Timer use for refresh
+   * Timer for pushing update.
    */
-  private timerID!: NodeJS.Timeout;
+  private timeoutPush!: NodeJS.Timeout;
 
   /**
-   * Ref to the main div DOM element, required for selection management
+   * Timer for getting update.
+   */
+  private timeoutGet!: NodeJS.Timeout;
+
+  /**
+   * Ref to the main div DOM element, required for selection management.
    */
   private nodeRef = createRef<HTMLDivElement>();
 
   /**
-   * RGA value at last update/get
+   * RGA value at last update/get.
    */
   private oldValue: string;
 
   /**
-   * Is true if there have been any writes since the last RGA update
+   * Is true if there have been any writes since the last RGA update.
    */
   private isDirty: boolean;
 
@@ -64,7 +71,16 @@ export default class CMDEditor extends Component<
   };
 
   /**
-   * Default constructor
+   * Callback used when new update received.
+   */
+  private updateCallback() {
+    clearTimeout(this.timeoutGet);
+    this.pullValue();
+    this.setGetTimeout();
+  }
+
+  /**
+   * Default constructor.
    */
   constructor(props: CMDEditorProps) {
     super(props);
@@ -73,9 +89,7 @@ export default class CMDEditor extends Component<
       this.props.docName,
       "RGA",
       false,
-      function () {
-        return;
-      }
+      this.updateCallback.bind(this)
     );
     this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
       value = rga.get().toArray().join("");
@@ -91,9 +105,13 @@ export default class CMDEditor extends Component<
   }
 
   /**
-   * This function is called to update the RGA with the new value from the editor
+   * This function is called to update the RGA with the new value from the editor.
    */
   private updateRGA() {
+    if (!this.state.isConnected) {
+      return;
+    }
+    clearTimeout(this.timeoutPush);
     if (!this.isDirty) {
       return;
     }
@@ -103,6 +121,7 @@ export default class CMDEditor extends Component<
 
     if (diffs.length === 1 && diffs[0][0] === DiffMatchPatch.DIFF_EQUAL) {
       // Same value
+      this.isDirty = false;
       return;
     }
 
@@ -128,12 +147,17 @@ export default class CMDEditor extends Component<
       }
     });
     this.oldValue = this.state.value;
+    this.isDirty = false;
   }
 
   /**
-   * This function is called to retrieve the remote value of the RGA
+   * This function is called to retrieve the remote value of the RGA.
    */
   private pullValue() {
+    if (!this.state.isConnected) {
+      return;
+    }
+    this.updateRGA();
     this.props.collection.pull(client.utils.ConsistencyLevel.None);
     let newValue = "";
     this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
@@ -162,19 +186,17 @@ export default class CMDEditor extends Component<
     });
 
     if (cursorStart !== null && cursorEnd !== null) {
-      [
-        textarea.selectionStart,
-        textarea.selectionEnd,
-      ] = this.updateCursorPosition(diffs, cursorStart, cursorEnd);
+      [textarea.selectionStart, textarea.selectionEnd] =
+        this.updateCursorPosition(diffs, cursorStart, cursorEnd);
     }
   }
 
   /**
-   * Calculates the new cursor position according to the changes
-   * @param diffs List of differences
-   * @param cursorStart Initial cursor start position
-   * @param cursorEnd Initial cursor end position
-   * @returns New cursor position
+   * Calculates the new cursor position according to the changes.
+   * @param diffs List of differences.
+   * @param cursorStart Initial cursor start position.
+   * @param cursorEnd Initial cursor end position.
+   * @returns New cursor position.
    */
   private updateCursorPosition(
     diffs: Diff[],
@@ -227,14 +249,22 @@ export default class CMDEditor extends Component<
   }
 
   /**
-   * Every 3 seconds, update the RGA with the editor's value and retrieves remote changes from the RGA
+   * Updates the RGA with the editor's value after the timeout.
    */
-  private setSyncTimer() {
-    this.timerID = setTimeout(() => {
+  private setPushTimeout() {
+    this.timeoutPush = setTimeout(() => {
       this.updateRGA();
-      this.pullValue();
-      this.setSyncTimer();
-    }, 3000);
+    }, TIMEOUTPUSH);
+  }
+
+  /**
+   * Retrieves remote changes from the RGA after the timeout.
+   */
+  private setGetTimeout() {
+    this.timeoutGet = setTimeout(() => {
+      this.props.collection.forceGet(this.state.rga);
+      this.setGetTimeout();
+    }, TIMEOUTGET);
   }
 
   /**
@@ -246,8 +276,7 @@ export default class CMDEditor extends Component<
       ?.getElementsByClassName("w-md-editor-text-input")
       ?.item(0) as HTMLInputElement;
     textarea.placeholder = this.props.placeholder;
-
-    this.setSyncTimer();
+    this.setGetTimeout();
   }
 
   /**
@@ -255,19 +284,22 @@ export default class CMDEditor extends Component<
    * It remove the timer set in componentDidMount().
    */
   componentWillUnmount(): void {
-    clearInterval(this.timerID);
+    clearTimeout(this.timeoutPush);
+    clearTimeout(this.timeoutGet);
   }
 
   /**
    * This function is used to simulate the offline mode.
    */
   switchConnection(): void {
-    if (this.state.isConnected) {
-      clearInterval(this.timerID);
-    } else {
-      this.setSyncTimer();
-    }
-    this.setState({ isConnected: !this.state.isConnected });
+    this.setState({ isConnected: !this.state.isConnected }, () => {
+      if (this.state.isConnected) {
+        this.updateCallback();
+      } else {
+        clearTimeout(this.timeoutPush);
+        clearTimeout(this.timeoutGet);
+      }
+    });
   }
 
   /**
@@ -277,7 +309,10 @@ export default class CMDEditor extends Component<
     const valueUI = typeof value == "undefined" ? "" : value;
     if (this.state.value === valueUI) return;
 
-    this.isDirty = true;
+    if (!this.isDirty) {
+      this.isDirty = true;
+      this.setPushTimeout();
+    }
 
     this.setState({
       value: valueUI,
@@ -290,9 +325,12 @@ export default class CMDEditor extends Component<
    */
   handleSubmit(docName: string): void {
     let value = "";
-    const rga = this.props.collection.open(docName, "RGA", false, function () {
-      return;
-    });
+    const rga = this.props.collection.open(
+      docName,
+      "RGA",
+      false,
+      this.updateCallback.bind(this)
+    );
     if (this.state.isConnected) {
       this.props.session.transaction(client.utils.ConsistencyLevel.None, () => {
         value = rga.get().toArray().join("");
@@ -308,8 +346,8 @@ export default class CMDEditor extends Component<
   }
 
   /**
-   * The function is called when the content of the editor is updated. It
-   * returns a React element corresponding to the MDEditor.
+   * The function is called when the content of the editor is updated.
+   * It returns a React element corresponding to the MDEditor.
    */
   render(): JSX.Element {
     const myToolbar = commands.getCommands();
@@ -358,7 +396,7 @@ export default class CMDEditor extends Component<
         ></path>
       </svg>
     ),
-    execute: (_state: TextState, _api: TextApi) => {
+    execute: (_state: TextState, _api: TextAreaTextApi) => {
       const dom = this.nodeRef.current?.getElementsByClassName(
         "w-md-editor-content"
       )[0];
@@ -389,7 +427,7 @@ export default class CMDEditor extends Component<
         ></path>
       </svg>
     ),
-    execute: (_state: TextState, _api: TextApi) => {
+    execute: (_state: TextState, _api: TextAreaTextApi) => {
       const link = document.createElement("a");
       link.setAttribute(
         "href",
