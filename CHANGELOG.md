@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [1.2.0] - 2021-07-22
+
+### Added
+
 - Provide a service worker file in public repository
 - Add a callback to receive notifications when a crdt is updated
 
@@ -18,15 +32,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove frequent pooling but keep a backup call when it has not received a new version for a while
 - Set push timeout only when there has been a write
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Fix mdeditor new version types
-
-### Security
 
 ## [1.1.0] - 2021-05-17
 
