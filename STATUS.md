@@ -17,13 +17,12 @@ In order to fix these limitations, we plan to replace it with a single-panel edi
 
 This implementation uses the alpha version of the Concordant platform, and inherits from its limitations (documented in [Concordant client STATUS.md](https://gitlab.inria.fr/concordant/software/c-client/-/blob/master/STATUS.md)). This leads to more limitations:
 
-- Disconnected operation is not yet supported.  This will be fixed by moving the c-service into a service worker.
-- Altough interactive performance is good, it degrades badly for larger documents (note that deleted characters remain in the document state as tombstones).  This will be fixed by enabling support for delta propagation. 
+- Altough interactive performance is good, it degrades badly for larger documents (note that deleted characters remain in the document state as tombstones). This will be fixed by enabling support for delta propagation.
 
 ## Bugs
 
 We are aware of the following bugs:
 
-- Responsiveness degrades for large documents.   
+- Responsiveness degrades for large documents.
 
 We are working actively on fixing the bugs.
