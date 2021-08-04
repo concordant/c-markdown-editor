@@ -1,6 +1,6 @@
 {
   "name": "@concordant/c-markdown-editor",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "license": "MIT",
   "description": "A Markdown collaborative Editor React Component, to demonstrate the Concordant Platform",
   "keywords": [
@@ -29,7 +29,7 @@
   "dependencies": {
     "@concordant/c-client": "~1.3.0",
     "@testing-library/react": "^11.1.0",
-    "@uiw/react-md-editor": "^3.4.10",
+    "@uiw/react-md-editor": "^3.4.11",
     "diff-match-patch": "^1.0.5",
     "dom-to-image-more": "^2.8.0",
     "prismjs": "^1.24.1",
@@ -59,16 +59,16 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.3",
-    "@testing-library/user-event": "^13.2.0",
+    "@testing-library/user-event": "^13.2.1",
     "@types/diff-match-patch": "^1.0.32",
     "@types/jest": "^26.0.24",
-    "@types/node": "^14.17.5",
-    "@types/react": "^17.0.14",
+    "@types/node": "^14.17.8",
+    "@types/react": "^17.0.15",
     "@types/react-dom": "^17.0.9",
-    "@typescript-eslint/eslint-plugin": "^4.28.4",
-    "@typescript-eslint/parser": "^4.28.4",
-    "antd": "^4.16.8",
-    "eslint": "^7.31.0",
+    "@typescript-eslint/eslint-plugin": "^4.29.0",
+    "@typescript-eslint/parser": "^4.29.0",
+    "antd": "^4.16.10",
+    "eslint": "^7.32.0",
     "eslint-plugin-react": "^7.24.0",
     "husky": "^6.0.0",
     "lint-staged": "^10.5.4",
@@ -76,7 +76,7 @@
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "^4.0.3",
-    "ts-loader": "^9.2.3",
+    "ts-loader": "^9.2.5",
     "typescript": "^4.3.5"
   },
   "lint-staged": {
