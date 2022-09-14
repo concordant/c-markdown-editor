@@ -1,4 +1,4 @@
-## Private release
+# Private release
 
 The C-Markdown-Editor, and the Concordant stack it depends on,
 are delivered as NPM packages.

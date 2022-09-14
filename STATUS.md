@@ -1,7 +1,5 @@
 # Status of C-Markdown Editor
 
-16 April 2021
-
 This is an alpha version of a collaborative text editor. Its aim is to provide an example of a collaborative application leveraging the Concordant vision. Features, performance, and user-friendliness have been secondary considerations.
 
 ## Limitations due to the editing engine
