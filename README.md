@@ -5,8 +5,6 @@ component build on top of the MDEditor React component. This initial component
 has become collaborative thanks to features provided by the Concordant
 platform.
 
-The main repository is in [the Inria gitlab](https://gitlab.inria.fr/concordant/software/c-markdown-editor/) (this is where you can post tickets). There is an identical clone in [GitHub](https://github.com/concordant/software/c-markdown-editor) (tickets here might be ignored).
-
 ## Requirements (versions)
 
 This project has been tested
@@ -19,7 +17,7 @@ It might work with older Node and NPM versions.
 Install the package:
 
 ```shell
-$ npm i @concordant/c-markdown-editor
+npm i @concordant/c-markdown-editor
 ```
 
 Import the c-client and the component in your project:
